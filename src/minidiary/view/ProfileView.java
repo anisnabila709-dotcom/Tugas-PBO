@@ -23,7 +23,7 @@ public class ProfileView extends JFrame {
     }
 
     private void initComponents() {
-        User user = Session.getUser();
+        User user = Session.getCurrentUser();  // FIXED
 
         if (user == null) {
             MessageUtil.showError(this, "Silakan login terlebih dahulu!");
