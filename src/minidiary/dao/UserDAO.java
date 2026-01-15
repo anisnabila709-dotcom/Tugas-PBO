@@ -6,16 +6,16 @@ import minidiary.model.User;
 
 public class UserDAO {
 
-    // penyimpanan sementara (nanti bisa diganti MySQL)
+    // penyimpanan sementara (bisa diganti DB nanti)
     private static List<User> users = new ArrayList<>();
 
     // CREATE / REGISTER
     public boolean insert(User user) {
 
-        // cek email sudah terdaftar atau belum
+        // cek email sudah dipakai
         for (User u : users) {
             if (u.getEmail().equalsIgnoreCase(user.getEmail())) {
-                return false; // email sudah dipakai
+                return false;
             }
         }
 
@@ -24,12 +24,37 @@ public class UserDAO {
         return true;
     }
 
-    // READ - ambil semua user (optional)
+    // digunakan oleh RegisterController
+    public boolean register(User user) {
+        return insert(user);
+    }
+
+    // CEK USERNAME ADA
+    public boolean isUsernameExists(String username) {
+        for (User u : users) {
+            if (u.getUsername().equalsIgnoreCase(username)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // CEK EMAIL ADA
+    public boolean isEmailExists(String email) {
+        for (User u : users) {
+            if (u.getEmail().equalsIgnoreCase(email)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // READ - ambil semua user
     public List<User> getAll() {
         return users;
     }
 
-    // READ - cari user berdasarkan email (untuk login)
+    // digunakan login
     public User getByEmail(String email) {
         for (User u : users) {
             if (u.getEmail().equalsIgnoreCase(email)) {
@@ -39,7 +64,7 @@ public class UserDAO {
         return null;
     }
 
-    // READ - cari user berdasarkan id
+    // READ - ambil user berdasarkan id
     public User getById(int id) {
         for (User u : users) {
             if (u.getId() == id) {
