@@ -19,6 +19,8 @@ public class UserDAO {
         return false;
     }
 
+    
+
     public boolean isEmailExists(String email) {
         for (User user : users) {
             if (user.getEmail().equalsIgnoreCase(email)) {
