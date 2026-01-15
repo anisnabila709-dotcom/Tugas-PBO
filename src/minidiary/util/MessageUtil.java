@@ -43,4 +43,6 @@ public class MessageUtil {
             "Konfirmasi",
             JOptionPane.YES_NO_OPTION
         );
-        retu
+        return result == JOptionPane.YES_OPTION;
+    }
+}
