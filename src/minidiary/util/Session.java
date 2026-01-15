@@ -2,10 +2,19 @@ package minidiary.util;
 
 import minidiary.model.User;
 
-public class Session {
+/**
+ * Session class
+ * Menyimpan user yang sedang login
+ * Menggunakan static agar bisa diakses dari mana saja
+ */
+public final class Session {
 
     // user yang sedang login
     private static User currentUser;
+
+    // constructor dikunci agar tidak bisa dibuat object
+    private Session() {
+    }
 
     // set user saat login berhasil
     public static void setCurrentUser(User user) {
@@ -17,7 +26,7 @@ public class Session {
         return currentUser;
     }
 
-    // cek apakah sudah login
+    // cek apakah user sudah login
     public static boolean isLoggedIn() {
         return currentUser != null;
     }
@@ -27,4 +36,3 @@ public class Session {
         currentUser = null;
     }
 }
- 
