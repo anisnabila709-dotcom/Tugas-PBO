@@ -7,6 +7,29 @@ public class User {
     private String email;
     private String password;
 
+    // ===== CONSTRUCTOR =====
+
+    // constructor kosong (WAJIB ADA)
+    public User() {
+    }
+
+    // constructor untuk register / insert
+    public User(String username, String email, String password) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+    }
+
+    // constructor lengkap (AMAN untuk View / Controller)
+    public User(int id, String username, String email, String password) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+    }
+
+    // ===== GETTER & SETTER =====
+
     public int getId() {
         return id;
     }
