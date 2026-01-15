@@ -2,91 +2,65 @@ package minidiary.view;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
-import minidiary.controller.UserController;
-import minidiary.model.User;
-import minidiary.util.Validator;
+import minidiary.controller.RegisterController;
 
 public class RegisterView extends JFrame {
 
-    private JTextField txtName;
+    private JTextField txtUsername;
     private JTextField txtEmail;
     private JPasswordField txtPassword;
+    private JPasswordField txtConfirm;
     private JButton btnRegister;
-    private UserController userController;
+
+    private RegisterController registerController;
 
     public RegisterView() {
         setTitle("Register - Mini Diary");
-        setSize(350, 300);
+        setSize(350, 320);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        userController = new UserController();
+        registerController = new RegisterController();
 
         initComponents();
         setVisible(true);
     }
 
     private void initComponents() {
-        JPanel panel = new JPanel(new GridLayout(4, 2, 10, 10));
+        JPanel panel = new JPanel(new GridLayout(5, 2, 10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JLabel lblName = new JLabel("Nama:");
-        JLabel lblEmail = new JLabel("Email:");
-        JLabel lblPassword = new JLabel("Password:");
+        panel.add(new JLabel("Username:"));
+        txtUsername = new JTextField();
+        panel.add(txtUsername);
 
-        txtName = new JTextField();
+        panel.add(new JLabel("Email:"));
         txtEmail = new JTextField();
+        panel.add(txtEmail);
+
+        panel.add(new JLabel("Password:"));
         txtPassword = new JPasswordField();
+        panel.add(txtPassword);
+
+        panel.add(new JLabel("Konfirmasi Password:"));
+        txtConfirm = new JPasswordField();
+        panel.add(txtConfirm);
 
         btnRegister = new JButton("Register");
-
-        panel.add(lblName);
-        panel.add(txtName);
-        panel.add(lblEmail);
-        panel.add(txtEmail);
-        panel.add(lblPassword);
-        panel.add(txtPassword);
         panel.add(new JLabel());
         panel.add(btnRegister);
 
         add(panel);
 
-        btnRegister.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                registerAction();
-            }
-        });
+        btnRegister.addActionListener(e -> registerAction());
     }
 
     private void registerAction() {
-        String name = txtName.getText();
-        String email = txtEmail.getText();
-        String pass = new String(txtPassword.getPassword());
-
-        if (Validator.isEmpty(name) || Validator.isEmpty(email) || Validator.isEmpty(pass)) {
-            JOptionPane.showMessageDialog(this, "Semua field wajib diisi!");
-            return;
-        }
-
-        if (!Validator.isValidEmail(email)) {
-            JOptionPane.showMessageDialog(this, "Format email tidak valid!");
-            return;
-        }
-
-        if (!Validator.isStrongPassword(pass)) {
-            JOptionPane.showMessageDialog(this, "Password minimal 6 karakter!");
-            return;
-        }
-
-        User user = new User(0, name, email, pass);
-
-        if (userController.register(user)) {
-            JOptionPane.showMessageDialog(this, "Registrasi berhasil!");
-            dispose();  
-            new LoginView(); // opsional kalau kamu sudah punya login
-        } else {
-            JOptionPane.showMessageDialog(this, "Registrasi gagal!");
-        }
+        registerController.register(
+            txtUsername.getText(),
+            txtEmail.getText(),
+            new String(txtPassword.getPassword()),
+            new String(txtConfirm.getPassword())
+        );
     }
 }
