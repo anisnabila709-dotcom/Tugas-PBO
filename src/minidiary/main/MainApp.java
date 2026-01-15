@@ -1,23 +1,21 @@
 package minidiary.main;
 
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import minidiary.view.LoginView;
-// atau jika mau langsung register:
-// import minidiary.view.RegisterView;
 
 public class MainApp {
 
     public static void main(String[] args) {
-
-        // Styling opsional (biar Swing lebih modern)
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {}
+        } catch (ClassNotFoundException |
+                 InstantiationException |
+                 IllegalAccessException |
+                 UnsupportedLookAndFeelException e) {
+            e.printStackTrace();
+        }
 
-        // Mulai dari halaman Login
         new LoginView();
-
-        // Atau kalau kamu belum punya Login:
-        // new RegisterView();
-        // new ReadView();
     }
 }

@@ -1,50 +1,44 @@
 package minidiary.dao;
 
-import java.sql.*;
-import minidiary.config.Database;
 import minidiary.model.User;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserDAO {
 
-    public boolean insert(User user) {
-        String sql = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
+    // DATABASE SEMENTARA (IN-MEMORY)
+    private static List<User> users = new ArrayList<>();
 
-        try (
-            Connection conn = Database.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
-            ps.setString(1, user.getName());
-            ps.setString(2, user.getEmail());
-            ps.setString(3, user.getPassword());
-            ps.executeUpdate();
-            return true;
-
-        } catch (Exception e) {
-            System.out.println("Insert gagal: " + e.getMessage());
-            return false;
+    // ===== REGISTER =====
+    public boolean isUsernameExists(String username) {
+        for (User user : users) {
+            if (user.getUsername().equalsIgnoreCase(username)) {
+                return true;
+            }
         }
+        return false;
     }
 
-    public User getByEmail(String email) {
-        String sql = "SELECT * FROM users WHERE email = ?";
-        try (
-            Connection conn = Database.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
-            ps.setString(1, email);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return new User(
-                    rs.getInt("id"),
-                    rs.getString("name"),
-                    rs.getString("email"),
-                    rs.getString("password")
-                );
+    public boolean isEmailExists(String email) {
+        for (User user : users) {
+            if (user.getEmail().equalsIgnoreCase(email)) {
+                return true;
             }
+        }
+        return false;
+    }
 
-        } catch (Exception e) {
-            System.out.println("Read gagal: " + e.getMessage());
+    public boolean register(User user) {
+        users.add(user);
+        return true;
+    }
+
+    // ===== LOGIN =====
+    public User getByEmail(String email) {
+        for (User user : users) {
+            if (user.getEmail().equalsIgnoreCase(email)) {
+                return user;
+            }
         }
         return null;
     }

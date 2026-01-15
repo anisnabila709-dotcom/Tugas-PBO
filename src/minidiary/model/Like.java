@@ -1,21 +1,25 @@
 package minidiary.model;
 
+/**
+ * Model Like
+ */
 public class Like {
 
     private int id;
-    private int userId;
     private int diaryId;
+    private int userId;
 
+    // constructor kosong
     public Like() {
     }
 
-    public Like(int id, int userId, int diaryId) {
+    // constructor lengkap
+    public Like(int id, int diaryId, int userId) {
         this.id = id;
-        this.userId = userId;
         this.diaryId = diaryId;
+        this.userId = userId;
     }
 
-    // Getter & Setter
     public int getId() {
         return id;
     }
@@ -24,8 +28,19 @@ public class Like {
         this.id = id;
     }
 
+    public int getDiaryId() {
+        return diaryId;
+    }
+
+    public void setDiaryId(int diaryId) {
+        this.diaryId = diaryId;
+    }
+
     public int getUserId() {
         return userId;
     }
 
-    public void setUserId(int us
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+}

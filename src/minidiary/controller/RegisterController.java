@@ -3,7 +3,6 @@ package minidiary.controller;
 import minidiary.dao.UserDAO;
 import minidiary.model.User;
 import minidiary.util.MessageUtil;
-import minidiary.util.Validator;
 
 public class RegisterController {
 
@@ -15,16 +14,22 @@ public class RegisterController {
 
     public void register(String username, String email, String password, String confirmPassword) {
 
-        if (!Validator.notEmpty(username, email, password, confirmPassword)) {
+        // ===== VALIDASI KOSONG =====
+        if (username == null || username.isEmpty()
+                || email == null || email.isEmpty()
+                || password == null || password.isEmpty()
+                || confirmPassword == null || confirmPassword.isEmpty()) {
             MessageUtil.showError("Semua field wajib diisi!");
             return;
         }
 
-        if (!Validator.isValidEmail(email)) {
+        // ===== VALIDASI EMAIL =====
+        if (!email.contains("@")) {
             MessageUtil.showError("Format email tidak valid!");
             return;
         }
 
+        // ===== VALIDASI PASSWORD =====
         if (password.length() < 6) {
             MessageUtil.showError("Password minimal 6 karakter!");
             return;
@@ -35,6 +40,7 @@ public class RegisterController {
             return;
         }
 
+        // ===== CEK DUPLIKASI =====
         if (userDAO.isUsernameExists(username)) {
             MessageUtil.showError("Username sudah digunakan!");
             return;
@@ -45,6 +51,7 @@ public class RegisterController {
             return;
         }
 
+        // ===== SIMPAN USER =====
         User user = new User();
         user.setUsername(username);
         user.setEmail(email);
@@ -53,7 +60,7 @@ public class RegisterController {
         boolean success = userDAO.register(user);
 
         if (success) {
-            MessageUtil.showSuccess("Registrasi berhasil! Silakan login.");
+            MessageUtil.showError("Registrasi berhasil! Silakan login.");
         } else {
             MessageUtil.showError("Registrasi gagal.");
         }
