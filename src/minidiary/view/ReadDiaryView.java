@@ -7,17 +7,17 @@ import java.util.List;
 import minidiary.controller.DiaryController;
 import minidiary.model.Diary;
 
-public class ReadView extends JFrame {
+public class ReadDiaryView extends JFrame {
 
     private JTable tableDiary;
     private DefaultTableModel tableModel;
     private DiaryController diaryController;
 
-    public ReadView() {
+    public ReadDiaryView() {
         setTitle("Mini Diary - Semua Catatan");
         setSize(600, 400);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         diaryController = new DiaryController();
 
