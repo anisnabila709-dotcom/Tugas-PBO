@@ -34,10 +34,20 @@ public class LikeDAO {
         return total;
     }
 
-    // OPTIONAL – remove like (unlike)
+    // DELETE – remove like (unlike)
     public boolean delete(int diaryId, int userId) {
         Like target = null;
         for (Like like : likes) {
             if (like.getDiaryId() == diaryId && like.getUserId() == userId) {
                 target = like;
                 break;
+            }
+        }
+
+        if (target != null) {
+            likes.remove(target);
+            return true;
+        }
+        return false;
+    }
+}

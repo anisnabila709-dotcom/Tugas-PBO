@@ -1,64 +1,105 @@
-package minidiary.model;
+package minidiary.dao;
 
-public class User {
+import java.util.ArrayList;
+import java.util.List;
+import minidiary.model.User;
 
-    private int id;
-    private String username;
-    private String email;
-    private String password;
+public class UserDAO {
 
-    // ===== CONSTRUCTOR =====
+    // penyimpanan sementara (bisa diganti DB nanti)
+    private static List<User> users = new ArrayList<>();
 
-    // constructor kosong (WAJIB ADA)
-    public User() {
+    // CREATE / REGISTER
+    public boolean insert(User user) {
+
+        // cek email sudah dipakai
+        for (User u : users) {
+            if (u.getEmail().equalsIgnoreCase(user.getEmail())) {
+                return false;
+            }
+        }
+
+        user.setId(users.size() + 1);
+        users.add(user);
+        return true;
     }
 
-    // constructor untuk register / insert
-    public User(String username, String email, String password) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
+    // digunakan oleh RegisterController
+    public boolean register(User user) {
+        return insert(user);
     }
 
-    // constructor lengkap (AMAN untuk View / Controller)
-    public User(int id, String username, String email, String password) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.password = password;
+    // CEK USERNAME ADA
+    public boolean isUsernameExists(String username) {
+        for (User u : users) {
+            if (u.getUsername().equalsIgnoreCase(username)) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    // ===== GETTER & SETTER =====
-
-    public int getId() {
-        return id;
+    // CEK EMAIL ADA
+    public boolean isEmailExists(String email) {
+        for (User u : users) {
+            if (u.getEmail().equalsIgnoreCase(email)) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    // READ - ambil semua user
+    public List<User> getAll() {
+        return users;
     }
 
-    public String getUsername() {
-        return username;
+    // digunakan login
+    public User getByEmail(String email) {
+        for (User u : users) {
+            if (u.getEmail().equalsIgnoreCase(email)) {
+                return u;
+            }
+        }
+        return null;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    // READ - ambil user berdasarkan id
+    public User getById(int id) {
+        for (User u : users) {
+            if (u.getId() == id) {
+                return u;
+            }
+        }
+        return null;
     }
 
-    public String getEmail() {
-        return email;
+    // UPDATE
+    public boolean update(User user) {
+        for (int i = 0; i < users.size(); i++) {
+            User u = users.get(i);
+            if (u.getId() == user.getId()) {
+                users.set(i, user);
+                return true;
+            }
+        }
+        return false;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    // DELETE
+    public boolean delete(int id) {
+        User target = null;
+        for (User u : users) {
+            if (u.getId() == id) {
+                target = u;
+                break;
+            }
+        }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+        if (target != null) {
+            users.remove(target);
+            return true;
+        }
+        return false;
     }
 }
