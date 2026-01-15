@@ -12,11 +12,18 @@ public class DiaryDAO {
     private Connection conn;
 
     public DiaryDAO() {
-        conn = Database.getConnection();
+        try {
+            conn = Database.getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            conn = null;
+        }
     }
 
     // CREATE
     public boolean insert(Diary diary) {
+        if (conn == null) return false;
+
         String sql = "INSERT INTO diary (title, content, user_id) VALUES (?, ?, ?)";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -34,6 +41,8 @@ public class DiaryDAO {
     // READ ALL
     public List<Diary> getAll() {
         List<Diary> list = new ArrayList<>();
+        if (conn == null) return list;
+
         String sql = "SELECT * FROM diary";
 
         try (Statement st = conn.createStatement();
@@ -53,12 +62,16 @@ public class DiaryDAO {
         return list;
     }
 
-    // READ BY ID (stub aman)
+    // READ BY ID
     public Diary getById(int id) {
+        if (conn == null) return null;
+
         String sql = "SELECT * FROM diary WHERE id = ?";
+
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
+
             if (rs.next()) {
                 Diary d = new Diary();
                 d.setId(rs.getInt("id"));
@@ -75,6 +88,8 @@ public class DiaryDAO {
 
     // UPDATE
     public boolean update(Diary diary) {
+        if (conn == null) return false;
+
         String sql = "UPDATE diary SET title = ?, content = ? WHERE id = ?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -91,6 +106,8 @@ public class DiaryDAO {
 
     // DELETE
     public boolean delete(int id) {
+        if (conn == null) return false;
+
         String sql = "DELETE FROM diary WHERE id = ?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -103,4 +120,3 @@ public class DiaryDAO {
         }
     }
 }
-

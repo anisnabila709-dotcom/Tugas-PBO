@@ -23,10 +23,10 @@ public class ProfileView extends JFrame {
     }
 
     private void initComponents() {
-        User user = Session.getCurrentUser();  // FIXED
+        User user = Session.getCurrentUser();
 
         if (user == null) {
-            MessageUtil.showError(this, "Silakan login terlebih dahulu!");
+            MessageUtil.showError("Silakan login terlebih dahulu!");
             new LoginView();
             dispose();
             return;
@@ -35,8 +35,8 @@ public class ProfileView extends JFrame {
         JPanel panel = new JPanel(new GridLayout(4, 1, 10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        lblName = new JLabel("Nama   : " + user.getName());
-        lblEmail = new JLabel("Email  : " + user.getEmail());
+        lblName = new JLabel("Username : " + user.getUsername());
+        lblEmail = new JLabel("Email    : " + user.getEmail());
 
         btnLogout = new JButton("Logout");
 
@@ -51,7 +51,7 @@ public class ProfileView extends JFrame {
     }
 
     private void logoutAction() {
-        if (MessageUtil.confirm(this, "Yakin ingin logout?")) {
+        if (MessageUtil.confirm("Yakin ingin logout?")) {
             Session.clear();
             new LoginView();
             dispose();
