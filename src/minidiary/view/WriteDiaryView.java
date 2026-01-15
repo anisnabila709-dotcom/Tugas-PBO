@@ -1,59 +1,55 @@
 package minidiary.view;
 
-import minidiary.controller.DiaryController;
-
 import javax.swing.*;
 import java.awt.*;
 
 public class WriteDiaryView extends JFrame {
 
-    private JTextField titleField;
-    private JTextArea contentArea;
+    private JTextField txtTitle;
+    private JTextArea txtContent;
 
     public WriteDiaryView() {
-        setTitle("Write Diary");
+        setTitle("Tulis Diary");
         setSize(500, 400);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        JLabel titleLabel = new JLabel("Title:");
-        JLabel contentLabel = new JLabel("Content:");
+        txtTitle = new JTextField();
+        txtContent = new JTextArea();
 
-        titleField = new JTextField();
-        contentArea = new JTextArea();
-        contentArea.setLineWrap(true);
+        JButton btnSave = new JButton("Simpan");
+        JButton btnBack = new JButton("Kembali");
 
-        JButton saveButton = new JButton("Save");
-        JButton cancelButton = new JButton("Cancel");
+        btnSave.addActionListener(e -> {
+            String title = txtTitle.getText();
+            String content = txtContent.getText();
 
-        saveButton.addActionListener(e -> {
-            DiaryController controller = new DiaryController();
-            boolean success = controller.createDiary(
-                    titleField.getText(),
-                    contentArea.getText()
-            );
-
-            if (success) {
-                JOptionPane.showMessageDialog(this, "Diary berhasil disimpan");
-                dispose();
+            if (title.isEmpty() || content.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Judul dan isi tidak boleh kosong");
             } else {
-                JOptionPane.showMessageDialog(this, "Gagal menyimpan diary");
+                JOptionPane.showMessageDialog(this, "Diary berhasil disimpan (sementara)");
+                txtTitle.setText("");
+                txtContent.setText("");
             }
         });
 
-        cancelButton.addActionListener(e -> dispose());
+        btnBack.addActionListener(e -> {
+            new DashboardView();
+            dispose();
+        });
 
-        JPanel form = new JPanel(new GridLayout(4, 1, 5, 5));
-        form.add(titleLabel);
-        form.add(titleField);
-        form.add(contentLabel);
-        form.add(new JScrollPane(contentArea));
+        JPanel top = new JPanel(new GridLayout(2, 1));
+        top.add(new JLabel("Judul:"));
+        top.add(txtTitle);
 
-        JPanel buttons = new JPanel();
-        buttons.add(saveButton);
-        buttons.add(cancelButton);
+        JPanel bottom = new JPanel();
+        bottom.add(btnSave);
+        bottom.add(btnBack);
 
-        add(form, BorderLayout.CENTER);
-        add(buttons, BorderLayout.SOUTH);
+        add(top, BorderLayout.NORTH);
+        add(new JScrollPane(txtContent), BorderLayout.CENTER);
+        add(bottom, BorderLayout.SOUTH);
+
+        setVisible(true);
     }
 }

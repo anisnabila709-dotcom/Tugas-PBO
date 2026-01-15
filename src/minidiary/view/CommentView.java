@@ -1,39 +1,44 @@
 package minidiary.view;
 
-import minidiary.controller.CommentController;
-
 import javax.swing.*;
 import java.awt.*;
 
 public class CommentView extends JFrame {
 
-    private JTextArea commentArea;
-    private int diaryId;
+    private JTextArea txtComment;
 
-    public CommentView(int diaryId) {
-        this.diaryId = diaryId;
-
-        setTitle("Comment");
+    public CommentView() {
+        setTitle("Komentar Diary");
         setSize(400, 300);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        commentArea = new JTextArea();
-        JButton sendButton = new JButton("Send");
+        txtComment = new JTextArea();
 
-        sendButton.addActionListener(e -> {
-            CommentController controller = new CommentController();
-            boolean success = controller.addComment(diaryId, commentArea.getText());
+        JButton btnSend = new JButton("Kirim Komentar");
+        JButton btnBack = new JButton("Kembali");
 
-            if (success) {
-                JOptionPane.showMessageDialog(this, "Komentar terkirim");
-                dispose();
+        btnSend.addActionListener(e -> {
+            if (txtComment.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Komentar tidak boleh kosong");
             } else {
-                JOptionPane.showMessageDialog(this, "Gagal mengirim komentar");
+                JOptionPane.showMessageDialog(this, "Komentar berhasil dikirim (sementara)");
+                txtComment.setText("");
             }
         });
 
-        add(new JScrollPane(commentArea), BorderLayout.CENTER);
-        add(sendButton, BorderLayout.SOUTH);
+        btnBack.addActionListener(e -> {
+            new DashboardView();
+            dispose();
+        });
+
+        JPanel bottom = new JPanel();
+        bottom.add(btnSend);
+        bottom.add(btnBack);
+
+        add(new JScrollPane(txtComment), BorderLayout.CENTER);
+        add(bottom, BorderLayout.SOUTH);
+
+        setVisible(true);
     }
 }
