@@ -2,6 +2,8 @@ package minidiary.view;
 
 import javax.swing.*;
 import java.awt.*;
+import minidiary.util.MessageUtil;
+import minidiary.util.Validator;
 
 public class CommentView extends JFrame {
 
@@ -18,15 +20,22 @@ public class CommentView extends JFrame {
         JButton btnSend = new JButton("Kirim Komentar");
         JButton btnBack = new JButton("Kembali");
 
+        // Kirim komentar
         btnSend.addActionListener(e -> {
-            if (txtComment.getText().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Komentar tidak boleh kosong");
-            } else {
-                JOptionPane.showMessageDialog(this, "Komentar berhasil dikirim (sementara)");
-                txtComment.setText("");
+            String comment = txtComment.getText();
+
+            if (Validator.isEmpty(comment)) {
+                MessageUtil.showWarning(this, "Komentar tidak boleh kosong!");
+                return;
             }
+
+            // ========== sementara (belum DB) ==========
+            MessageUtil.showInfo(this, "Komentar berhasil dikirim! (sementara)");
+
+            txtComment.setText("");
         });
 
+        // Kembali ke dashboard
         btnBack.addActionListener(e -> {
             new DashboardView();
             dispose();

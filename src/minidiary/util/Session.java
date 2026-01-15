@@ -7,24 +7,33 @@ public class Session {
     // user yang sedang login
     private static User currentUser;
 
-    // set user saat login berhasil
+    // SET user
     public static void setCurrentUser(User user) {
         currentUser = user;
     }
 
-    // ambil user yang sedang login
+    // GET objek user penuh
     public static User getCurrentUser() {
         return currentUser;
     }
 
-    // cek apakah sudah login
+    // GET user id
+    public static int getUserId() {
+        return currentUser != null ? currentUser.getId() : -1;
+    }
+
+    // GET username
+    public static String getUsername() {
+        return currentUser != null ? currentUser.getUsername() : null;
+    }
+
+    // CEK login
     public static boolean isLoggedIn() {
         return currentUser != null;
     }
 
-    // logout / hapus session
+    // LOGOUT
     public static void clear() {
         currentUser = null;
     }
 }
- 
