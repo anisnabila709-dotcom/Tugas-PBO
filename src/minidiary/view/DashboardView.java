@@ -1,40 +1,46 @@
 package minidiary.view;
 
-import minidiary.util.Session;
-
 import javax.swing.*;
 import java.awt.*;
 
 public class DashboardView extends JFrame {
 
     public DashboardView() {
-        setTitle("Dashboard");
+        setTitle("Mini Diary - Dashboard");
         setSize(400, 300);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        JLabel title = new JLabel("Mini Diary Dashboard", SwingConstants.CENTER);
-        title.setFont(new Font("Arial", Font.BOLD, 16));
+        JButton btnWrite = new JButton("Tulis Diary");
+        JButton btnRead = new JButton("Lihat Diary");
+        JButton btnComment = new JButton("Komentar");
+        JButton btnLogout = new JButton("Logout");
 
-        JButton writeButton = new JButton("Write Diary");
-        JButton logoutButton = new JButton("Logout");
-
-        writeButton.addActionListener(e -> {
-            new WriteDiaryView().setVisible(true);
-        });
-
-        logoutButton.addActionListener(e -> {
-            Session.clear();
+        btnWrite.addActionListener(e -> {
+            new WriteDiaryView();
             dispose();
-            JOptionPane.showMessageDialog(this, "Logout berhasil");
         });
 
-        JPanel panel = new JPanel(new GridLayout(3, 1, 10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        panel.add(title);
-        panel.add(writeButton);
-        panel.add(logoutButton);
+        btnComment.addActionListener(e -> {
+            new CommentView();
+            dispose();
+        });
 
-        add(panel);
+        btnRead.addActionListener(e -> {
+            JOptionPane.showMessageDialog(this, "Fitur baca diary belum dibuat");
+        });
+
+        btnLogout.addActionListener(e -> {
+            JOptionPane.showMessageDialog(this, "Logout berhasil");
+            dispose();
+        });
+
+        setLayout(new GridLayout(4, 1, 10, 10));
+        add(btnWrite);
+        add(btnRead);
+        add(btnComment);
+        add(btnLogout);
+
+        setVisible(true);
     }
 }
