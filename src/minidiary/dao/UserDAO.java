@@ -1,44 +1,88 @@
 package minidiary.dao;
 
+import minidiary.config.Database;
 import minidiary.model.User;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 public class UserDAO {
 
-    // DATABASE SEMENTARA (IN-MEMORY)
-    private static List<User> users = new ArrayList<>();
+    // ===== CEK USERNAME =====
+    public boolean isUsernameExists(String username) {
+        String sql = "SELECT id FROM users WHERE username = ?";
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // ===== CEK EMAIL =====
+    public boolean isEmailExists(String email) {
+        String sql = "SELECT id FROM users WHERE email = ?";
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
     // ===== REGISTER =====
-    public boolean isUsernameExists(String username) {
-        for (User user : users) {
-            if (user.getUsername().equalsIgnoreCase(username)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean isEmailExists(String email) {
-        for (User user : users) {
-            if (user.getEmail().equalsIgnoreCase(email)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public boolean register(User user) {
-        users.add(user);
-        return true;
+        String sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, user.getUsername());
+            ps.setString(2, user.getEmail());
+            ps.setString(3, user.getPassword());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     // ===== LOGIN =====
     public User getByEmail(String email) {
-        for (User user : users) {
-            if (user.getEmail().equalsIgnoreCase(email)) {
-                return user;
+        String sql = "SELECT * FROM users WHERE email = ?";
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return new User(
+                    rs.getInt("id"),
+                    rs.getString("username"),
+                    rs.getString("email"),
+                    rs.getString("password")
+                );
             }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }

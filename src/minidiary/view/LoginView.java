@@ -2,6 +2,7 @@ package minidiary.view;
 
 import javax.swing.*;
 import java.awt.*;
+
 import minidiary.controller.LoginController;
 import minidiary.model.User;
 import minidiary.util.MessageUtil;
@@ -13,10 +14,11 @@ public class LoginView extends JFrame {
     private JTextField txtEmail;
     private JPasswordField txtPassword;
     private JButton btnLogin;
+    private JButton btnRegister;
 
     public LoginView() {
         setTitle("Login - Mini Diary");
-        setSize(350, 250);
+        setSize(350, 260);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -25,7 +27,7 @@ public class LoginView extends JFrame {
     }
 
     private void initComponents() {
-        JPanel panel = new JPanel(new GridLayout(4, 2, 10, 10));
+        JPanel panel = new JPanel(new GridLayout(5, 2, 10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JLabel lblEmail = new JLabel("Email:");
@@ -35,17 +37,21 @@ public class LoginView extends JFrame {
         txtPassword = new JPasswordField();
 
         btnLogin = new JButton("Login");
+        btnRegister = new JButton("Register");
 
         panel.add(lblEmail);
         panel.add(txtEmail);
         panel.add(lblPassword);
         panel.add(txtPassword);
-        panel.add(new JLabel());
+
         panel.add(btnLogin);
+        panel.add(btnRegister);
 
         add(panel);
 
+        // action listener
         btnLogin.addActionListener(e -> loginAction());
+        btnRegister.addActionListener(e -> openRegister());
     }
 
     private void loginAction() {
@@ -61,12 +67,17 @@ public class LoginView extends JFrame {
         User user = loginController.login(email, password);
 
         if (user != null) {
-            Session.setCurrentUser(user);  // FIX HERE
+            Session.setCurrentUser(user);
             MessageUtil.showInfo(this, "Login berhasil!");
-            new ProfileView(); // nanti diganti DashboardView
+            new ProfileView(); // atau DashboardView
             dispose();
         } else {
             MessageUtil.showError(this, "Email atau password salah!");
         }
+    }
+
+    private void openRegister() {
+        new RegisterView();
+        dispose();
     }
 }
