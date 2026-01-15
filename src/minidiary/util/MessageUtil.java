@@ -1,14 +1,46 @@
 package minidiary.util;
 
 import javax.swing.JOptionPane;
+import java.awt.Component;
 
 public class MessageUtil {
 
-    public static void showSuccess(String message) {
-        JOptionPane.showMessageDialog(null, message, "Sukses", JOptionPane.INFORMATION_MESSAGE);
+    // PESAN INFORMASI
+    public static void showInfo(Component parent, String message) {
+        JOptionPane.showMessageDialog(
+            parent,
+            message,
+            "Informasi",
+            JOptionPane.INFORMATION_MESSAGE
+        );
     }
 
-    public static void showError(String message) {
-        JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
+    // PESAN ERROR
+    public static void showError(Component parent, String message) {
+        JOptionPane.showMessageDialog(
+            parent,
+            message,
+            "Error",
+            JOptionPane.ERROR_MESSAGE
+        );
     }
-}
+
+    // PESAN WARNING
+    public static void showWarning(Component parent, String message) {
+        JOptionPane.showMessageDialog(
+            parent,
+            message,
+            "Peringatan",
+            JOptionPane.WARNING_MESSAGE
+        );
+    }
+
+    // KONFIRMASI (YES / NO)
+    public static boolean confirm(Component parent, String message) {
+        int result = JOptionPane.showConfirmDialog(
+            parent,
+            message,
+            "Konfirmasi",
+            JOptionPane.YES_NO_OPTION
+        );
+        retu
