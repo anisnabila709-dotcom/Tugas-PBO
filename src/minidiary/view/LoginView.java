@@ -2,6 +2,8 @@ package minidiary.view;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import minidiary.controller.LoginController;
 import minidiary.model.User;
@@ -14,7 +16,7 @@ public class LoginView extends JFrame {
     private JTextField txtEmail;
     private JPasswordField txtPassword;
     private JButton btnLogin;
-    private JButton btnRegister;
+    private JLabel lblRegister;
 
     public LoginView() {
         setTitle("Login - Mini Diary");
@@ -27,7 +29,7 @@ public class LoginView extends JFrame {
     }
 
     private void initComponents() {
-        JPanel panel = new JPanel(new GridLayout(5, 2, 10, 10));
+        JPanel panel = new JPanel(new GridLayout(6, 2, 10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JLabel lblEmail = new JLabel("Email:");
@@ -37,21 +39,34 @@ public class LoginView extends JFrame {
         txtPassword = new JPasswordField();
 
         btnLogin = new JButton("Login");
-        btnRegister = new JButton("Register");
+
+        // label register (kayak web)
+        lblRegister = new JLabel("<HTML><U>Belum punya akun? Register di sini</U></HTML>");
+        lblRegister.setForeground(Color.BLUE);
+        lblRegister.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         panel.add(lblEmail);
         panel.add(txtEmail);
         panel.add(lblPassword);
         panel.add(txtPassword);
 
+        panel.add(new JLabel());
         panel.add(btnLogin);
-        panel.add(btnRegister);
+
+        panel.add(new JLabel());
+        panel.add(lblRegister);
 
         add(panel);
 
         // action listener
         btnLogin.addActionListener(e -> loginAction());
-        btnRegister.addActionListener(e -> openRegister());
+        lblRegister.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                new RegisterView();
+                dispose();
+            }
+        });
     }
 
     private void loginAction() {
@@ -69,15 +84,10 @@ public class LoginView extends JFrame {
         if (user != null) {
             Session.setCurrentUser(user);
             MessageUtil.showInfo(this, "Login berhasil!");
-            new ProfileView(); // atau DashboardView
+            new DashboardView();
             dispose();
         } else {
             MessageUtil.showError(this, "Email atau password salah!");
         }
-    }
-
-    private void openRegister() {
-        new RegisterView();
-        dispose();
     }
 }
