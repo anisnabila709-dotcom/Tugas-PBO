@@ -67,6 +67,7 @@ public class LoginView extends JFrame {
                 dispose();
             }
         });
+        
     }
 
     private void loginAction() {
