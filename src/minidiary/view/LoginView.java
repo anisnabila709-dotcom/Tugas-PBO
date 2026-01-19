@@ -84,7 +84,7 @@ public class LoginView extends JFrame {
         if (user != null) {
             Session.setCurrentUser(user);
             MessageUtil.showInfo(this, "Login berhasil!");
-            new DashboardView();
+            new DashboardFeedView();
             dispose();
         } else {
             MessageUtil.showError(this, "Email atau password salah!");

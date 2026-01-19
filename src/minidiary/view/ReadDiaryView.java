@@ -28,7 +28,7 @@ public class ReadDiaryView extends JFrame {
     }
 
     private void initTable() {
-        String[] columnNames = {"ID", "Judul", "Tanggal", "Konten"};
+        String[] columnNames = {"ID", "Judul", "Dibuat Pada", "Konten"};
         tableModel = new DefaultTableModel(columnNames, 0);
         tableDiary = new JTable(tableModel);
         tableDiary.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -46,7 +46,7 @@ public class ReadDiaryView extends JFrame {
             Object[] row = {
                 d.getId(),
                 d.getTitle(),
-                d.getDate(),
+                d.getCreatedAt(), // ✅ FIX
                 d.getContent()
             };
             tableModel.addRow(row);

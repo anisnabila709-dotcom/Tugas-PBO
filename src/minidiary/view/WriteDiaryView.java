@@ -35,7 +35,7 @@ public class WriteDiaryView extends JFrame {
 
         btnSave.addActionListener(e -> saveDiary());
         btnBack.addActionListener(e -> {
-            new DashboardView();
+            new DashboardFeedView();
             dispose();
         });
 

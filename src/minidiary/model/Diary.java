@@ -1,27 +1,27 @@
 package minidiary.model;
 
-import java.time.LocalDate;
+import java.sql.Timestamp;
 
 public class Diary {
 
     private int id;
     private int userId;
     private String title;
-    private LocalDate date;
     private String content;
+    private Timestamp createdAt;
 
     public Diary() {
     }
 
-    public Diary(int id, int userId, String title, LocalDate date, String content) {
+    public Diary(int id, int userId, String title, String content, Timestamp createdAt) {
         this.id = id;
         this.userId = userId;
         this.title = title;
-        this.date = date;
         this.content = content;
+        this.createdAt = createdAt;
     }
 
-    // Getter & Setter
+    // ===== Getter & Setter =====
     public int getId() {
         return id;
     }
@@ -46,19 +46,19 @@ public class Diary {
         this.title = title;
     }
 
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
     public String getContent() {
         return content;
     }
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
     }
 }
