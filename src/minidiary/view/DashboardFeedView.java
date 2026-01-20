@@ -1,12 +1,11 @@
 package minidiary.view;
 
+import minidiary.controller.DiaryController;
+import minidiary.model.Diary;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
-
-import minidiary.controller.DiaryController;
-import minidiary.model.Diary;
-import minidiary.util.Session;
 
 public class DashboardFeedView extends JFrame {
 
@@ -14,15 +13,15 @@ public class DashboardFeedView extends JFrame {
     private JPanel feedPanel;
 
     public DashboardFeedView() {
+        diaryController = new DiaryController();
+
         setTitle("Mini Diary");
         setSize(700, 500);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        diaryController = new DiaryController();
-
         initUI();
-        loadDiaryFeed();
+        loadDiary();
 
         setVisible(true);
     }
@@ -32,36 +31,35 @@ public class DashboardFeedView extends JFrame {
 
         // ===== TOP BAR =====
         JPanel topBar = new JPanel(new BorderLayout());
-        topBar.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+        topBar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        JLabel lblTitle = new JLabel("Mini Diary");
-        lblTitle.setFont(new Font("Arial", Font.BOLD, 18));
-
-        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-
+        // --- KIRI (CREATE) ---
         JButton btnCreate = new JButton("+ Create");
-        JButton btnLogout = new JButton("Logout");
-
         btnCreate.addActionListener(e -> {
-            new WriteDiaryView();
+            // GANTI JIKA VIEW CREATE DIARY KAMU NAMANYA BERBEDA
+            new ReadDiaryView();
             dispose();
         });
 
+        // --- KANAN (LOGOUT) ---
+        JButton btnLogout = new JButton("Logout");
         btnLogout.addActionListener(e -> {
-            Session.clear();
             new LoginView();
             dispose();
         });
 
-        rightPanel.add(btnCreate);
-        rightPanel.add(btnLogout);
+        // --- TENGAH (JUDUL) ---
+        JLabel lblTitle = new JLabel("Mini Diary Feed");
+        lblTitle.setFont(new Font("Arial", Font.BOLD, 18));
+        lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
 
-        topBar.add(lblTitle, BorderLayout.WEST);
-        topBar.add(rightPanel, BorderLayout.EAST);
+        topBar.add(btnCreate, BorderLayout.WEST);
+        topBar.add(lblTitle, BorderLayout.CENTER);
+        topBar.add(btnLogout, BorderLayout.EAST);
 
         add(topBar, BorderLayout.NORTH);
 
-        // ===== FEED PANEL =====
+        // ===== FEED =====
         feedPanel = new JPanel();
         feedPanel.setLayout(new BoxLayout(feedPanel, BoxLayout.Y_AXIS));
 
@@ -69,13 +67,19 @@ public class DashboardFeedView extends JFrame {
         add(scrollPane, BorderLayout.CENTER);
     }
 
-    private void loadDiaryFeed() {
+    private void loadDiary() {
         feedPanel.removeAll();
 
         List<Diary> diaries = diaryController.getAllDiaries();
 
-        for (Diary d : diaries) {
-            feedPanel.add(createDiaryCard(d));
+        if (diaries.isEmpty()) {
+            JLabel lblEmpty = new JLabel("Belum ada diary");
+            lblEmpty.setAlignmentX(Component.CENTER_ALIGNMENT);
+            feedPanel.add(lblEmpty);
+        } else {
+            for (Diary d : diaries) {
+                feedPanel.add(createDiaryCard(d));
+            }
         }
 
         feedPanel.revalidate();
@@ -85,38 +89,30 @@ public class DashboardFeedView extends JFrame {
     private JPanel createDiaryCard(Diary diary) {
         JPanel card = new JPanel(new BorderLayout());
         card.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(10, 10, 10, 10),
-                BorderFactory.createLineBorder(Color.LIGHT_GRAY)
+                BorderFactory.createLineBorder(Color.GRAY),
+                BorderFactory.createEmptyBorder(10, 10, 10, 10)
         ));
 
         JLabel lblTitle = new JLabel(diary.getTitle());
         lblTitle.setFont(new Font("Arial", Font.BOLD, 14));
 
         JTextArea txtContent = new JTextArea(diary.getContent());
+        txtContent.setEditable(false);
         txtContent.setLineWrap(true);
         txtContent.setWrapStyleWord(true);
-        txtContent.setEditable(false);
         txtContent.setBackground(null);
-
-        JLabel lblFooter = new JLabel(
-                "oleh User ID: " + diary.getUserId()
-        );
-        lblFooter.setFont(new Font("Arial", Font.ITALIC, 11));
 
         JButton btnComment = new JButton("Komentar");
         btnComment.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this,
-                    "Fitur komentar akan dibuat");
+            setVisible(false);
+            new CommentView(this, diary);
         });
-
-        JPanel bottomPanel = new JPanel(new BorderLayout());
-        bottomPanel.add(lblFooter, BorderLayout.WEST);
-        bottomPanel.add(btnComment, BorderLayout.EAST);
 
         card.add(lblTitle, BorderLayout.NORTH);
         card.add(txtContent, BorderLayout.CENTER);
-        card.add(bottomPanel, BorderLayout.SOUTH);
+        card.add(btnComment, BorderLayout.SOUTH);
 
+        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
         return card;
     }
 }

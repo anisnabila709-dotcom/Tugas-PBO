@@ -11,7 +11,7 @@ public class DiaryDAO {
 
     // ================= CREATE =================
     public boolean insert(Diary diary) {
-        String sql = "INSERT INTO diaries (user_id, title, content) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO diaries (user_id, title, content, created_at) VALUES (?, ?, ?, NOW())";
 
         try (Connection conn = Database.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -39,16 +39,20 @@ public class DiaryDAO {
 
             while (rs.next()) {
                 Diary d = new Diary();
+
                 d.setId(rs.getInt("id"));
                 d.setUserId(rs.getInt("user_id"));
                 d.setTitle(rs.getString("title"));
                 d.setContent(rs.getString("content"));
+                d.setCreatedAt(rs.getTimestamp("created_at"));
+
                 list.add(d);
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return list;
     }
 
@@ -64,16 +68,20 @@ public class DiaryDAO {
 
             if (rs.next()) {
                 Diary d = new Diary();
+
                 d.setId(rs.getInt("id"));
                 d.setUserId(rs.getInt("user_id"));
                 d.setTitle(rs.getString("title"));
                 d.setContent(rs.getString("content"));
+                d.setCreatedAt(rs.getTimestamp("created_at"));
+
                 return d;
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return null;
     }
 
