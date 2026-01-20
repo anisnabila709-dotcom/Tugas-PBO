@@ -13,48 +13,67 @@ public class WriteDiaryView extends JFrame {
     private JTextField txtTitle;
     private JTextArea txtContent;
     private DiaryController diaryController;
+    private DashboardFeedView dashboard;
 
-    public WriteDiaryView() {
-        setTitle("Tulis Diary");
-        setSize(500, 400);
+    public WriteDiaryView(DashboardFeedView dashboard) {
+        this.dashboard = dashboard;
+        diaryController = new DiaryController();
+
+        setTitle("Mini Diary - Tulis Diary");
+        setSize(600, 450);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        diaryController = new DiaryController();
-
-        initComponents();
+        initUI();
         setVisible(true);
     }
 
-    private void initComponents() {
+    private void initUI() {
+        JPanel main = new JPanel(new BorderLayout(10, 10));
+        main.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+
+        JLabel header = new JLabel("Tulis Diary");
+        header.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        main.add(header, BorderLayout.NORTH);
+
+        JPanel form = new JPanel();
+        form.setLayout(new BoxLayout(form, BoxLayout.Y_AXIS));
+
+        form.add(new JLabel("Judul"));
         txtTitle = new JTextField();
-        txtContent = new JTextArea();
+        txtTitle.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        form.add(txtTitle);
+
+        form.add(Box.createVerticalStrut(15));
+
+        form.add(new JLabel("Isi Diary"));
+        txtContent = new JTextArea(10, 30);
+        txtContent.setLineWrap(true);
+        txtContent.setWrapStyleWord(true);
+        form.add(new JScrollPane(txtContent));
+
+        main.add(form, BorderLayout.CENTER);
 
         JButton btnSave = new JButton("Simpan");
         JButton btnBack = new JButton("Kembali");
 
         btnSave.addActionListener(e -> saveDiary());
         btnBack.addActionListener(e -> {
-            new DashboardFeedView();
             dispose();
+            dashboard.setVisible(true);
         });
 
-        JPanel top = new JPanel(new GridLayout(2, 1, 5, 5));
-        top.add(new JLabel("Judul:"));
-        top.add(txtTitle);
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        btnPanel.add(btnSave);
+        btnPanel.add(btnBack);
 
-        JPanel bottom = new JPanel();
-        bottom.add(btnSave);
-        bottom.add(btnBack);
-
-        add(top, BorderLayout.NORTH);
-        add(new JScrollPane(txtContent), BorderLayout.CENTER);
-        add(bottom, BorderLayout.SOUTH);
+        main.add(btnPanel, BorderLayout.SOUTH);
+        add(main);
     }
 
     private void saveDiary() {
         if (!Session.isLoggedIn()) {
-            MessageUtil.showError(this, "Silakan login terlebih dahulu!");
+            MessageUtil.showError(this, "Silakan login dulu!");
             return;
         }
 
@@ -71,12 +90,11 @@ public class WriteDiaryView extends JFrame {
         diary.setContent(content);
         diary.setUserId(Session.getCurrentUser().getId());
 
-        boolean success = diaryController.addDiary(diary);
-
-        if (success) {
+        if (diaryController.addDiary(diary)) {
             MessageUtil.showInfo(this, "Diary berhasil disimpan!");
-            txtTitle.setText("");
-            txtContent.setText("");
+            dashboard.loadDiary();
+            dashboard.setVisible(true);
+            dispose();
         } else {
             MessageUtil.showError(this, "Gagal menyimpan diary!");
         }

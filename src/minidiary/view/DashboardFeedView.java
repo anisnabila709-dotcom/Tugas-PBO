@@ -33,22 +33,20 @@ public class DashboardFeedView extends JFrame {
         JPanel topBar = new JPanel(new BorderLayout());
         topBar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // --- KIRI (CREATE) ---
+        // CREATE
         JButton btnCreate = new JButton("+ Create");
         btnCreate.addActionListener(e -> {
-            // GANTI JIKA VIEW CREATE DIARY KAMU NAMANYA BERBEDA
-            new ReadDiaryView();
-            dispose();
+            setVisible(false);
+            new WriteDiaryView(this);
         });
 
-        // --- KANAN (LOGOUT) ---
+        // LOGOUT
         JButton btnLogout = new JButton("Logout");
         btnLogout.addActionListener(e -> {
             new LoginView();
             dispose();
         });
 
-        // --- TENGAH (JUDUL) ---
         JLabel lblTitle = new JLabel("Mini Diary Feed");
         lblTitle.setFont(new Font("Arial", Font.BOLD, 18));
         lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
@@ -67,15 +65,13 @@ public class DashboardFeedView extends JFrame {
         add(scrollPane, BorderLayout.CENTER);
     }
 
-    private void loadDiary() {
+    public void loadDiary() {
         feedPanel.removeAll();
 
         List<Diary> diaries = diaryController.getAllDiaries();
 
         if (diaries.isEmpty()) {
-            JLabel lblEmpty = new JLabel("Belum ada diary");
-            lblEmpty.setAlignmentX(Component.CENTER_ALIGNMENT);
-            feedPanel.add(lblEmpty);
+            feedPanel.add(new JLabel("Belum ada diary"));
         } else {
             for (Diary d : diaries) {
                 feedPanel.add(createDiaryCard(d));
