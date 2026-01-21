@@ -1,53 +1,74 @@
 package minidiary.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-import minidiary.model.Like;
+import minidiary.config.Database;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 public class LikeDAO {
 
-    private static List<Like> likes = new ArrayList<>();
+    // cek apakah user sudah like diary
+    public boolean isLiked(int userId, int diaryId) {
+        String sql = "SELECT id FROM likes WHERE users_id = ? AND diaries_id = ?";
+        try (Connection c = Database.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
 
-    // CREATE – tambah like
-    public boolean insert(Like like) {
+            ps.setInt(1, userId);
+            ps.setInt(2, diaryId);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
 
-        // cek apakah user sudah like diary ini (opsional)
-        for (Like l : likes) {
-            if (l.getDiaryId() == like.getDiaryId() &&
-                l.getUserId() == like.getUserId()) {
-                return false; // sudah like
-            }
-        }
-
-        likes.add(like);
-        return true;
-    }
-
-    // READ – hitung jumlah like berdasarkan diary id
-    public int countByDiaryId(int diaryId) {
-        int total = 0;
-        for (Like like : likes) {
-            if (like.getDiaryId() == diaryId) {
-                total++;
-            }
-        }
-        return total;
-    }
-
-    // DELETE – remove like (unlike)
-    public boolean delete(int diaryId, int userId) {
-        Like target = null;
-        for (Like like : likes) {
-            if (like.getDiaryId() == diaryId && like.getUserId() == userId) {
-                target = like;
-                break;
-            }
-        }
-
-        if (target != null) {
-            likes.remove(target);
-            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return false;
+    }
+
+    // like diary
+    public boolean like(int userId, int diaryId) {
+        String sql = "INSERT INTO likes (users_id, diaries_id) VALUES (?, ?)";
+        try (Connection c = Database.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ps.setInt(2, diaryId);
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            return false; // biasanya karena UNIQUE constraint
+        }
+    }
+
+    // unlike diary
+    public boolean unlike(int userId, int diaryId) {
+        String sql = "DELETE FROM likes WHERE users_id = ? AND diaries_id = ?";
+        try (Connection c = Database.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ps.setInt(2, diaryId);
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // total like per diary
+    public int getTotalLike(int diaryId) {
+        String sql = "SELECT COUNT(*) FROM likes WHERE diaries_id = ?";
+        try (Connection c = Database.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setInt(1, diaryId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt(1);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 }

@@ -28,10 +28,16 @@ public class DiaryDAO {
         }
     }
 
-    // ================= READ ALL =================
+    // ================= READ ALL (JOIN USERS) =================
     public List<Diary> getAll() {
         List<Diary> list = new ArrayList<>();
-        String sql = "SELECT * FROM diaries ORDER BY id DESC";
+
+        String sql = """
+            SELECT d.id, d.user_id, d.title, d.content, d.created_at, u.username
+            FROM diaries d
+            JOIN users u ON d.user_id = u.id
+            ORDER BY d.id DESC
+        """;
 
         try (Connection conn = Database.getConnection();
              Statement st = conn.createStatement();
@@ -46,6 +52,9 @@ public class DiaryDAO {
                 d.setContent(rs.getString("content"));
                 d.setCreatedAt(rs.getTimestamp("created_at"));
 
+                // 🔥 INI KUNCI HILANGIN "Unknown"
+                d.setUsername(rs.getString("username"));
+
                 list.add(d);
             }
 
@@ -56,9 +65,14 @@ public class DiaryDAO {
         return list;
     }
 
-    // ================= READ BY ID =================
+    // ================= READ BY ID (JOIN USERS) =================
     public Diary getById(int id) {
-        String sql = "SELECT * FROM diaries WHERE id = ?";
+        String sql = """
+            SELECT d.id, d.user_id, d.title, d.content, d.created_at, u.username
+            FROM diaries d
+            JOIN users u ON d.user_id = u.id
+            WHERE d.id = ?
+        """;
 
         try (Connection conn = Database.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -74,6 +88,7 @@ public class DiaryDAO {
                 d.setTitle(rs.getString("title"));
                 d.setContent(rs.getString("content"));
                 d.setCreatedAt(rs.getTimestamp("created_at"));
+                d.setUsername(rs.getString("username"));
 
                 return d;
             }

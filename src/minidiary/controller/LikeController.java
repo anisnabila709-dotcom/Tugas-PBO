@@ -1,29 +1,25 @@
 package minidiary.controller;
 
 import minidiary.dao.LikeDAO;
-import minidiary.model.Like;
 
 public class LikeController {
 
-    private LikeDAO likeDAO;
+    private LikeDAO dao = new LikeDAO();
 
-    public LikeController() {
-        this.likeDAO = new LikeDAO();
+    public boolean isLiked(int userId, int diaryId) {
+        return dao.isLiked(userId, diaryId);
     }
 
-    // LIKE
-    public boolean likeDiary(int userId, int diaryId) {
-        Like like = new Like(0, userId, diaryId);
-        return likeDAO.insert(like);
+    // toggle like (IG style)
+    public void toggleLike(int userId, int diaryId) {
+        if (dao.isLiked(userId, diaryId)) {
+            dao.unlike(userId, diaryId);
+        } else {
+            dao.like(userId, diaryId);
+        }
     }
 
-    // UNLIKE
-    public boolean unlikeDiary(int userId, int diaryId) {
-        return likeDAO.delete(diaryId, userId);
-    }
-
-    // HITUNG JUMLAH LIKE
     public int getTotalLike(int diaryId) {
-        return likeDAO.countByDiaryId(diaryId);
+        return dao.getTotalLike(diaryId);
     }
 }

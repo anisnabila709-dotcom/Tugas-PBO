@@ -46,4 +46,10 @@ public class CommentController {
     public boolean deleteComment(int commentId) {
         return commentDAO.deleteComment(commentId);
     }
+
+    // HITUNG TOTAL KOMENTAR
+    public int getTotalComment(int diaryId) {
+        return commentDAO.countByDiaryId(diaryId);
+    }
+
 }

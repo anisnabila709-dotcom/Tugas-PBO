@@ -9,6 +9,7 @@ public class Diary {
     private String title;
     private String content;
     private Timestamp createdAt;
+    private String username;
 
     public Diary() {
     }
@@ -60,5 +61,13 @@ public class Diary {
 
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getUsername() { 
+        return username; 
+    } 
+    
+    public void setUsername(String username) { 
+        this.username = username; 
     }
 }

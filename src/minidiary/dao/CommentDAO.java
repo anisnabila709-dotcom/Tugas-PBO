@@ -9,6 +9,26 @@ import java.util.List;
 
 public class CommentDAO {
 
+    // ===== HITUNG TOTAL KOMENTAR PER DIARY =====
+    public int countByDiaryId(int diaryId) {
+        String sql = "SELECT COUNT(*) FROM comments WHERE diary_id = ?";
+        try (Connection conn = Database.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, diaryId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+
     // ===== CREATE COMMENT =====
     public boolean addComment(Comment comment) {
         String sql = "INSERT INTO comments (diary_id, user_id, content) VALUES (?, ?, ?)";
