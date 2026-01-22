@@ -115,18 +115,47 @@ public class DashboardFeedView extends JFrame {
         int diaryId = diary.getId();
         int userId = Session.getUserId();
 
-        // ===== EDIT (HANYA MILIK SENDIRI) =====
-        if (Session.isLoggedIn() && diary.getUserId() == Session.getUserId()) {
-            JButton btnEdit = new JButton("✏");
-            styleIconButton(btnEdit);
+        // ===== EDIT + DELETE (HANYA MILIK SENDIRI) =====
+if (Session.isLoggedIn() && diary.getUserId() == Session.getUserId()) {
 
-            btnEdit.addActionListener(e -> {
-                setVisible(false);
-                new EditDiaryView(this, diary);
-            });
+    // EDIT
+    JButton btnEdit = new JButton("✏");
+    styleIconButton(btnEdit);
 
-            iconPanel.add(btnEdit);
+    btnEdit.addActionListener(e -> {
+        setVisible(false);
+        new EditDiaryView(this, diary);
+    });
+
+    iconPanel.add(btnEdit);
+
+    // DELETE
+    JButton btnDelete = new JButton("🗑");
+    styleIconButton(btnDelete);
+
+    btnDelete.addActionListener(e -> {
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Yakin ingin menghapus diary ini?",
+                "Konfirmasi Hapus",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            boolean deleted = diaryController.deleteDiary(diary.getId());
+
+            if (deleted) {
+                JOptionPane.showMessageDialog(this, "Diary berhasil dihapus!");
+                loadDiary(); // refresh feed
+            } else {
+                JOptionPane.showMessageDialog(this, "Gagal menghapus diary!");
+            }
         }
+    });
+
+    iconPanel.add(btnDelete);
+}
+
 
         // ===== LIKE =====
         boolean liked = Session.isLoggedIn() &&
