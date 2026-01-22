@@ -115,6 +115,20 @@ public class DashboardFeedView extends JFrame {
         int diaryId = diary.getId();
         int userId = Session.getUserId();
 
+        // ===== EDIT (HANYA MILIK SENDIRI) =====
+        if (Session.isLoggedIn() && diary.getUserId() == Session.getUserId()) {
+            JButton btnEdit = new JButton("✏");
+            styleIconButton(btnEdit);
+
+            btnEdit.addActionListener(e -> {
+                setVisible(false);
+                new EditDiaryView(this, diary);
+            });
+
+            iconPanel.add(btnEdit);
+        }
+
+        // ===== LIKE =====
         boolean liked = Session.isLoggedIn() &&
                 likeController.isLiked(userId, diaryId);
 
@@ -124,18 +138,14 @@ public class DashboardFeedView extends JFrame {
         styleIconButton(btnLike);
         updateLikeButton(btnLike, liked, totalLike);
 
-        // ===== LIKE ACTION =====
         btnLike.addActionListener(e -> {
-
             if (!Session.isLoggedIn()) {
                 JOptionPane.showMessageDialog(this, "Silakan login dulu ❤️");
                 return;
             }
 
             likeController.toggleLike(userId, diaryId);
-
-            // reload biar data fresh
-            loadDiary();
+            loadDiary(); // refresh
         });
 
         // ===== COMMENT (TIDAK DIUBAH) =====
@@ -183,6 +193,6 @@ public class DashboardFeedView extends JFrame {
         btn.setBorderPainted(false);
         btn.setContentAreaFilled(false);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 14)); // 🔥 PENTING
+        btn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 14));
     }
 }
