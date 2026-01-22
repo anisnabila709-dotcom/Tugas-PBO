@@ -17,6 +17,9 @@ public class CommentView extends JFrame {
     private JPanel commentPanel;
     private JTextArea txtComment;
 
+    // 🔥 FLAG PENANDA ADA PERUBAHAN KOMENTAR
+    private boolean commentChanged = false;
+
     public CommentView(DashboardFeedView dashboard, Diary diary) {
         this.dashboard = dashboard;
         this.diary = diary;
@@ -41,12 +44,18 @@ public class CommentView extends JFrame {
         JButton btnBack = new JButton("← Kembali");
         btnBack.addActionListener(e -> {
             dispose();
+
+            // 🔥 PAKSA DASHBOARD RELOAD JIKA ADA KOMENTAR BARU
+            if (commentChanged) {
+                dashboard.loadDiary();
+            }
+
             dashboard.setVisible(true);
         });
         header.add(btnBack);
         add(header, BorderLayout.NORTH);
 
-        // ===== CENTER PANEL (POSTINGAN + KOMENTAR) =====
+        // ===== CENTER PANEL =====
         JPanel centerPanel = new JPanel(new BorderLayout());
 
         // --- POSTINGAN ---
@@ -136,6 +145,9 @@ public class CommentView extends JFrame {
         if (commentController.addComment(diary.getId(), content)) {
             txtComment.setText("");
             loadComments();
+
+            // 🔥 TANDAI ADA PERUBAHAN
+            commentChanged = true;
         }
     }
 }

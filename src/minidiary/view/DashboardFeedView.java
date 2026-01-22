@@ -22,7 +22,6 @@ public class DashboardFeedView extends JFrame {
         likeController = new LikeController();
         commentController = new CommentController();
 
-
         setTitle("Mini Diary");
         setSize(760, 540);
         setLocationRelativeTo(null);
@@ -31,12 +30,7 @@ public class DashboardFeedView extends JFrame {
         initUI();
         loadDiary();
 
-        /* 🔴 REALTIME-NYA
-        Timer timer = new Timer(3000, e -> loadDiary());
-        timer.start();*/ 
-
-        setVisible(true); 
-
+        setVisible(true);
     }
 
     private void initUI() {
@@ -48,23 +42,20 @@ public class DashboardFeedView extends JFrame {
         topBar.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
 
         JButton btnCreate = new JButton("+ Create");
-        btnCreate.setFocusPainted(false);
         btnCreate.addActionListener(e -> {
             setVisible(false);
             new WriteDiaryView(this);
         });
 
         JButton btnLogout = new JButton("Logout");
-        btnLogout.setFocusPainted(false);
         btnLogout.addActionListener(e -> {
             Session.clear();
             new LoginView();
             dispose();
         });
 
-        JLabel lblTitle = new JLabel("Mini Diary Feed");
+        JLabel lblTitle = new JLabel("Mini Diary Feed", SwingConstants.CENTER);
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
 
         topBar.add(btnCreate, BorderLayout.WEST);
         topBar.add(lblTitle, BorderLayout.CENTER);
@@ -79,25 +70,18 @@ public class DashboardFeedView extends JFrame {
 
         JScrollPane scrollPane = new JScrollPane(feedPanel);
         scrollPane.setBorder(null);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         add(scrollPane, BorderLayout.CENTER);
     }
 
+    // ==============================
+    // LOAD DIARY
+    // ==============================
     public void loadDiary() {
         feedPanel.removeAll();
 
         List<Diary> diaries = diaryController.getAllDiaries();
-
-        if (diaries.isEmpty()) {
-            JLabel empty = new JLabel("Belum ada diary");
-            empty.setFont(new Font("Segoe UI", Font.ITALIC, 14));
-            empty.setAlignmentX(Component.CENTER_ALIGNMENT);
-            feedPanel.add(Box.createVerticalStrut(20));
-            feedPanel.add(empty);
-        } else {
-            for (Diary d : diaries) {
-                feedPanel.add(createDiaryCard(d));
-            }
+        for (Diary d : diaries) {
+            feedPanel.add(createDiaryCard(d));
         }
 
         feedPanel.revalidate();
@@ -108,136 +92,55 @@ public class DashboardFeedView extends JFrame {
 
         JPanel card = new JPanel(new BorderLayout());
         card.setBackground(Color.WHITE);
-        card.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(210, 210, 210), 1, true),
-                BorderFactory.createEmptyBorder(6, 6, 6, 6)
-        ));
-
-        // ===== HEADER =====
-        JLabel lblTitle = new JLabel(diary.getTitle());
-        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 16));
-
-        JPanel header = new JPanel(new BorderLayout());
-        header.setBackground(Color.WHITE);
-        header.setBorder(BorderFactory.createEmptyBorder(8, 12, 4, 12));
-        header.add(lblTitle, BorderLayout.WEST);
-        header.add(new JSeparator(), BorderLayout.SOUTH);
+        card.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         // ===== CONTENT =====
-        String fullContent = diary.getContent();
-        int LIMIT = 250;
-        boolean isLong = fullContent.length() > LIMIT;
-
-        JPanel contentPanel = new JPanel();
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-        contentPanel.setBackground(Color.WHITE);
-
-        // TEXT DIARY
-        JTextArea txtContent = new JTextArea();
-        txtContent.setEditable(false);
+        JTextArea txtContent = new JTextArea(diary.getContent());
         txtContent.setLineWrap(true);
         txtContent.setWrapStyleWord(true);
+        txtContent.setEditable(false);
         txtContent.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        txtContent.setForeground(Color.BLACK);
         txtContent.setBackground(Color.WHITE);
-        txtContent.setBorder(BorderFactory.createEmptyBorder(6, 12, 0, 12));
-
-        String shortText = isLong
-                ? fullContent.substring(0, LIMIT) + "..."
-                : fullContent;
-
-        txtContent.setText(shortText);
-        contentPanel.add(txtContent);
-
-        // ===== SELENGKAPNYA =====
-        if (isLong) {
-            JLabel lblToggle = new JLabel("selengkapnya");
-            lblToggle.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-            lblToggle.setForeground(new Color(150, 150, 150));
-            lblToggle.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            lblToggle.setBorder(BorderFactory.createEmptyBorder(2, 12, 6, 12));
-            lblToggle.setAlignmentX(Component.LEFT_ALIGNMENT); // ⬅️ PENTING
-
-            final boolean[] expanded = {false};
-
-            lblToggle.addMouseListener(new java.awt.event.MouseAdapter() {
-
-                @Override
-                public void mouseClicked(java.awt.event.MouseEvent e) {
-                    expanded[0] = !expanded[0];
-                    txtContent.setText(expanded[0] ? fullContent : shortText);
-                    lblToggle.setText(expanded[0]
-                            ? "tampilkan lebih sedikit"
-                            : "selengkapnya");
-                }
-
-                @Override
-                public void mouseEntered(java.awt.event.MouseEvent e) {
-                    lblToggle.setForeground(new Color(30, 144, 255));
-                }
-
-                @Override
-                public void mouseExited(java.awt.event.MouseEvent e) {
-                    lblToggle.setForeground(new Color(150, 150, 150));
-                }
-            });
-
-            contentPanel.add(lblToggle);
-        }
-
 
         // ===== FOOTER =====
         JPanel footer = new JPanel(new BorderLayout());
         footer.setBackground(Color.WHITE);
-        footer.setBorder(BorderFactory.createEmptyBorder(4, 12, 8, 12));
 
-        // Username (kiri)
-        String username = diary.getUsername() != null ? diary.getUsername() : "Unknown";
-        JLabel lblUser = new JLabel("- " + username);
+        JLabel lblUser = new JLabel("- " + diary.getUsername());
         lblUser.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-        lblUser.setForeground(new Color(120, 120, 120));
 
-        // Icon panel (kanan bawah)
         JPanel iconPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         iconPanel.setBackground(Color.WHITE);
 
-        int totalLikes = likeController.getTotalLike(diary.getId());
+        int diaryId = diary.getId();
+        int userId = Session.getUserId();
+
         boolean liked = Session.isLoggedIn() &&
-                likeController.isLiked(Session.getUserId(), diary.getId());
+                likeController.isLiked(userId, diaryId);
+
+        int totalLike = likeController.getTotalLike(diaryId);
 
         JButton btnLike = new JButton();
         styleIconButton(btnLike);
+        updateLikeButton(btnLike, liked, totalLike);
 
-        if (liked) {
-            btnLike.setText("❤️ " + totalLikes);
-            btnLike.setForeground(Color.RED);
-        } else {
-            btnLike.setText("♡ " + totalLikes);
-        }
-
+        // ===== LIKE ACTION =====
         btnLike.addActionListener(e -> {
+
             if (!Session.isLoggedIn()) {
-                JOptionPane.showMessageDialog(this, "Silakan login dulu.");
+                JOptionPane.showMessageDialog(this, "Silakan login dulu ❤️");
                 return;
             }
 
-            likeController.toggleLike(Session.getUserId(), diary.getId());
+            likeController.toggleLike(userId, diaryId);
 
-            int updatedLikes = likeController.getTotalLike(diary.getId());
-            boolean nowLiked = likeController.isLiked(Session.getUserId(), diary.getId());
-
-            if (nowLiked) {
-                btnLike.setText("❤️ " + updatedLikes);
-                btnLike.setForeground(Color.RED);
-            } else {
-                btnLike.setText("♡ " + updatedLikes);
-                btnLike.setForeground(new Color(100, 100, 100));
-            }
+            // reload biar data fresh
+            loadDiary();
         });
 
-        int totalComments = commentController.getTotalComment(diary.getId());
-
-        JButton btnComment = new JButton("💬 " + totalComments);
+        // ===== COMMENT (TIDAK DIUBAH) =====
+        int totalComment = commentController.getTotalComment(diaryId);
+        JButton btnComment = new JButton("💬 " + totalComment);
         styleIconButton(btnComment);
 
         btnComment.addActionListener(e -> {
@@ -245,17 +148,13 @@ public class DashboardFeedView extends JFrame {
             new CommentView(this, diary);
         });
 
-
         iconPanel.add(btnLike);
         iconPanel.add(btnComment);
 
         footer.add(lblUser, BorderLayout.WEST);
         footer.add(iconPanel, BorderLayout.EAST);
 
-        // ===== ADD =====
-        card.add(header, BorderLayout.NORTH);
-        card.add(contentPanel, BorderLayout.CENTER);
-
+        card.add(txtContent, BorderLayout.CENTER);
         card.add(footer, BorderLayout.SOUTH);
 
         JPanel wrapper = new JPanel(new BorderLayout());
@@ -266,12 +165,24 @@ public class DashboardFeedView extends JFrame {
         return wrapper;
     }
 
+    // ==============================
+    // HELPER
+    // ==============================
+    private void updateLikeButton(JButton btn, boolean liked, int total) {
+        if (liked) {
+            btn.setText("❤️ " + total);
+            btn.setForeground(Color.RED);
+        } else {
+            btn.setText("🤍 " + total);
+            btn.setForeground(new Color(120, 120, 120));
+        }
+    }
+
     private void styleIconButton(JButton btn) {
         btn.setFocusPainted(false);
         btn.setBorderPainted(false);
         btn.setContentAreaFilled(false);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 14));
-        btn.setForeground(new Color(100, 100, 100));
+        btn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 14)); // 🔥 PENTING
     }
 }

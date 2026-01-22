@@ -4,22 +4,21 @@ import minidiary.model.User;
 
 public class Session {
 
-    // user yang sedang login
     private static User currentUser;
 
-    // SET user
+    // SET user login
     public static void setCurrentUser(User user) {
         currentUser = user;
     }
 
-    // GET objek user penuh
+    // GET objek user
     public static User getCurrentUser() {
         return currentUser;
     }
 
-    // GET user id
+    // GET user id (❗ FIX DI SINI)
     public static int getUserId() {
-        return currentUser != null ? currentUser.getId() : -1;
+        return currentUser != null ? currentUser.getId() : 0;
     }
 
     // GET username

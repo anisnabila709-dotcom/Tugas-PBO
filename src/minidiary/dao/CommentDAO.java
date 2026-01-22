@@ -9,17 +9,24 @@ import java.util.List;
 
 public class CommentDAO {
 
-    // ===== HITUNG TOTAL KOMENTAR PER DIARY =====
-    public int countByDiaryId(int diaryId) {
-        String sql = "SELECT COUNT(*) FROM comments WHERE diary_id = ?";
+    // ==============================
+    // HITUNG TOTAL KOMENTAR (DIPAKAI UI)
+    // ==============================
+    public int getTotalComment(int diaryId) {
+        String sql = """
+            SELECT COUNT(*) AS total
+            FROM comments
+            WHERE diary_id = ?
+        """;
+
         try (Connection conn = Database.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, diaryId);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                return rs.getInt(1);
+                return rs.getInt("total");
             }
 
         } catch (SQLException e) {
@@ -28,10 +35,21 @@ public class CommentDAO {
         return 0;
     }
 
+    // ==============================
+    // HITUNG TOTAL KOMENTAR (OPSIONAL)
+    // ==============================
+    public int countByDiaryId(int diaryId) {
+        return getTotalComment(diaryId);
+    }
 
-    // ===== CREATE COMMENT =====
+    // ==============================
+    // TAMBAH KOMENTAR
+    // ==============================
     public boolean addComment(Comment comment) {
-        String sql = "INSERT INTO comments (diary_id, user_id, content) VALUES (?, ?, ?)";
+        String sql = """
+            INSERT INTO comments (diary_id, user_id, content)
+            VALUES (?, ?, ?)
+        """;
 
         try (Connection conn = Database.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -40,8 +58,7 @@ public class CommentDAO {
             ps.setInt(2, comment.getUserId());
             ps.setString(3, comment.getContent());
 
-            ps.executeUpdate();
-            return true;
+            return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -49,17 +66,23 @@ public class CommentDAO {
         }
     }
 
-    // ===== GET COMMENTS BY DIARY =====
+    // ==============================
+    // AMBIL KOMENTAR PER DIARY
+    // ==============================
     public List<Comment> getByDiaryId(int diaryId) {
         List<Comment> comments = new ArrayList<>();
 
-        String sql = "SELECT * FROM comments WHERE diary_id = ?";
+        String sql = """
+            SELECT *
+            FROM comments
+            WHERE diary_id = ?
+            ORDER BY id ASC
+        """;
 
         try (Connection conn = Database.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, diaryId);
-
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -79,7 +102,9 @@ public class CommentDAO {
         return comments;
     }
 
-    // ===== DELETE COMMENT =====
+    // ==============================
+    // HAPUS KOMENTAR
+    // ==============================
     public boolean deleteComment(int commentId) {
         String sql = "DELETE FROM comments WHERE id = ?";
 
@@ -87,9 +112,7 @@ public class CommentDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, commentId);
-            ps.executeUpdate();
-
-            return true;
+            return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
