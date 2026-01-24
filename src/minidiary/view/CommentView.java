@@ -17,7 +17,6 @@ public class CommentView extends JFrame {
     private JPanel commentPanel;
     private JTextArea txtComment;
 
-    // 🔥 FLAG PENANDA ADA PERUBAHAN KOMENTAR
     private boolean commentChanged = false;
 
     public CommentView(DashboardFeedView dashboard, Diary diary) {
@@ -26,7 +25,7 @@ public class CommentView extends JFrame {
         this.commentController = new CommentController();
 
         setTitle("Komentar Diary");
-        setSize(600, 550);
+        setSize(600, 560);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -39,53 +38,61 @@ public class CommentView extends JFrame {
     private void initUI() {
         setLayout(new BorderLayout());
 
-        // ===== HEADER =====
+        // ================= HEADER =================
         JPanel header = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton btnBack = new JButton("← Kembali");
         btnBack.addActionListener(e -> {
             dispose();
-
-            // 🔥 PAKSA DASHBOARD RELOAD JIKA ADA KOMENTAR BARU
             if (commentChanged) {
                 dashboard.loadDiary();
             }
-
             dashboard.setVisible(true);
         });
         header.add(btnBack);
         add(header, BorderLayout.NORTH);
 
-        // ===== CENTER PANEL =====
+        // ================= CENTER =================
         JPanel centerPanel = new JPanel(new BorderLayout());
 
-        // --- POSTINGAN ---
+        // ===== POSTINGAN DIARY (SCROLL AMAN) =====
         JPanel diaryPanel = new JPanel(new BorderLayout());
         diaryPanel.setBorder(BorderFactory.createTitledBorder("Postingan"));
 
         JLabel lblTitle = new JLabel(diary.getTitle());
-        lblTitle.setFont(new Font("Arial", Font.BOLD, 14));
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblTitle.setBorder(BorderFactory.createEmptyBorder(4, 6, 4, 6));
 
         JTextArea txtContent = new JTextArea(diary.getContent());
         txtContent.setEditable(false);
         txtContent.setLineWrap(true);
         txtContent.setWrapStyleWord(true);
+        txtContent.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        txtContent.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
+        txtContent.setFocusable(false);
+
+        JScrollPane diaryScroll = new JScrollPane(txtContent);
+        diaryScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        diaryScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        diaryScroll.setPreferredSize(new Dimension(0, 170)); // 🔥 BATAS TINGGI FIX
+        diaryScroll.getVerticalScrollBar().setUnitIncrement(16);
 
         diaryPanel.add(lblTitle, BorderLayout.NORTH);
-        diaryPanel.add(new JScrollPane(txtContent), BorderLayout.CENTER);
+        diaryPanel.add(diaryScroll, BorderLayout.CENTER);
 
-        // --- KOMENTAR ---
-        commentPanel = new JPanel();
-        commentPanel.setLayout(new BoxLayout(commentPanel, BoxLayout.Y_AXIS));
+        // ===== KOMENTAR (SCROLL HALUS) =====
+        commentPanel = new JPanel(new GridBagLayout());
 
         JScrollPane commentScroll = new JScrollPane(commentPanel);
         commentScroll.setBorder(BorderFactory.createTitledBorder("Komentar"));
+        commentScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        commentScroll.getVerticalScrollBar().setUnitIncrement(16);
 
         centerPanel.add(diaryPanel, BorderLayout.NORTH);
         centerPanel.add(commentScroll, BorderLayout.CENTER);
 
         add(centerPanel, BorderLayout.CENTER);
 
-        // ===== INPUT =====
+        // ================= INPUT =================
         JPanel inputPanel = new JPanel(new BorderLayout());
         txtComment = new JTextArea(3, 30);
         txtComment.setLineWrap(true);
@@ -100,44 +107,62 @@ public class CommentView extends JFrame {
         add(inputPanel, BorderLayout.SOUTH);
     }
 
+    // ================= LOAD COMMENTS =================
     private void loadComments() {
         commentPanel.removeAll();
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(4, 6, 4, 6);
 
         List<Comment> comments =
                 commentController.getCommentsByDiary(diary.getId());
 
         if (comments.isEmpty()) {
             JLabel lblEmpty = new JLabel("Belum ada komentar");
-            lblEmpty.setAlignmentX(Component.CENTER_ALIGNMENT);
-            commentPanel.add(lblEmpty);
+            lblEmpty.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+            gbc.anchor = GridBagConstraints.CENTER;
+            commentPanel.add(lblEmpty, gbc);
         } else {
             for (Comment c : comments) {
                 JPanel card = new JPanel(new BorderLayout());
                 card.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(Color.LIGHT_GRAY),
-                        BorderFactory.createEmptyBorder(5,5,5,5)
+                        BorderFactory.createEmptyBorder(6, 6, 6, 6)
                 ));
 
                 JLabel lblUser = new JLabel("User ID: " + c.getUserId());
-                lblUser.setFont(new Font("Arial", Font.BOLD, 12));
+                lblUser.setFont(new Font("Segoe UI", Font.BOLD, 12));
 
                 JTextArea txt = new JTextArea(c.getContent());
                 txt.setEditable(false);
                 txt.setLineWrap(true);
                 txt.setWrapStyleWord(true);
+                txt.setFont(new Font("Segoe UI", Font.PLAIN, 12));
                 txt.setBackground(null);
+                txt.setBorder(null);
+                txt.setFocusable(false);
 
                 card.add(lblUser, BorderLayout.NORTH);
                 card.add(txt, BorderLayout.CENTER);
 
-                commentPanel.add(card);
+                commentPanel.add(card, gbc);
+                gbc.gridy++;
             }
         }
+
+        // 🔥 SPACER biar scroll ringan & natural
+        gbc.weighty = 1;
+        commentPanel.add(Box.createVerticalGlue(), gbc);
 
         commentPanel.revalidate();
         commentPanel.repaint();
     }
 
+    // ================= SEND COMMENT =================
     private void sendComment() {
         String content = txtComment.getText().trim();
         if (content.isEmpty()) return;
@@ -145,8 +170,6 @@ public class CommentView extends JFrame {
         if (commentController.addComment(diary.getId(), content)) {
             txtComment.setText("");
             loadComments();
-
-            // 🔥 TANDAI ADA PERUBAHAN
             commentChanged = true;
         }
     }

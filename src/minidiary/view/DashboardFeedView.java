@@ -70,6 +70,7 @@ public class DashboardFeedView extends JFrame {
 
         JScrollPane scrollPane = new JScrollPane(feedPanel);
         scrollPane.setBorder(null);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(18);
         add(scrollPane, BorderLayout.CENTER);
     }
 
@@ -88,19 +89,73 @@ public class DashboardFeedView extends JFrame {
         feedPanel.repaint();
     }
 
+    // ==============================
+    // DIARY CARD
+    // ==============================
     private JPanel createDiaryCard(Diary diary) {
 
         JPanel card = new JPanel(new BorderLayout());
         card.setBackground(Color.WHITE);
-        card.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        card.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
-        // ===== CONTENT =====
-        JTextArea txtContent = new JTextArea(diary.getContent());
+        // ===== CONTENT + SELENGKAPNYA (50 KATA) =====
+        String fullText = diary.getContent();
+        String[] words = fullText.split("\\s+");
+
+        int WORD_LIMIT = 50;
+        boolean isLong = words.length > WORD_LIMIT;
+
+        String shortText;
+        if (isLong) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < WORD_LIMIT; i++) {
+                sb.append(words[i]).append(" ");
+            }
+            shortText = sb.toString().trim() + "...";
+        } else {
+            shortText = fullText;
+        }
+
+        JTextArea txtContent = new JTextArea(shortText);
         txtContent.setLineWrap(true);
         txtContent.setWrapStyleWord(true);
         txtContent.setEditable(false);
+        txtContent.setFocusable(false);
+        txtContent.setOpaque(false);
+        txtContent.setBorder(null);
         txtContent.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        txtContent.setBackground(Color.WHITE);
+
+        JLabel lblToggle = new JLabel(isLong ? "Selengkapnya" : "");
+        lblToggle.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblToggle.setForeground(new Color(150, 150, 150)); // abu awal
+        lblToggle.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        final boolean[] expanded = { false };
+
+        lblToggle.addMouseListener(new java.awt.event.MouseAdapter() {
+
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                lblToggle.setForeground(new Color(0, 102, 204)); // biru
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                lblToggle.setForeground(new Color(150, 150, 150)); // balik abu
+            }
+
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                expanded[0] = !expanded[0];
+                txtContent.setText(expanded[0] ? fullText : shortText);
+                lblToggle.setText(expanded[0] ? "Lebih sedikit" : "Selengkapnya");
+            }
+        });
+
+        JPanel contentPanel = new JPanel(new BorderLayout());
+        contentPanel.setBackground(Color.WHITE);
+        contentPanel.add(txtContent, BorderLayout.CENTER);
+        if (isLong) contentPanel.add(lblToggle, BorderLayout.SOUTH);
 
         // ===== FOOTER =====
         JPanel footer = new JPanel(new BorderLayout());
@@ -113,59 +168,44 @@ public class DashboardFeedView extends JFrame {
         iconPanel.setBackground(Color.WHITE);
 
         int diaryId = diary.getId();
-        int userId = Session.getUserId();
 
-        // ===== EDIT + DELETE (HANYA MILIK SENDIRI) =====
-if (Session.isLoggedIn() && diary.getUserId() == Session.getUserId()) {
+        // ===== EDIT & DELETE =====
+        if (Session.isLoggedIn() && diary.getUserId() == Session.getUserId()) {
 
-    // EDIT
-    JButton btnEdit = new JButton("✏");
-    styleIconButton(btnEdit);
+            JButton btnEdit = new JButton("✏");
+            styleIconButton(btnEdit);
+            btnEdit.addActionListener(e -> {
+                setVisible(false);
+                new EditDiaryView(this, diary);
+            });
+            iconPanel.add(btnEdit);
 
-    btnEdit.addActionListener(e -> {
-        setVisible(false);
-        new EditDiaryView(this, diary);
-    });
-
-    iconPanel.add(btnEdit);
-
-    // DELETE
-    JButton btnDelete = new JButton("🗑");
-    styleIconButton(btnDelete);
-
-    btnDelete.addActionListener(e -> {
-        int confirm = JOptionPane.showConfirmDialog(
-                this,
-                "Yakin ingin menghapus diary ini?",
-                "Konfirmasi Hapus",
-                JOptionPane.YES_NO_OPTION
-        );
-
-        if (confirm == JOptionPane.YES_OPTION) {
-            boolean deleted = diaryController.deleteDiary(diary.getId());
-
-            if (deleted) {
-                JOptionPane.showMessageDialog(this, "Diary berhasil dihapus!");
-                loadDiary(); // refresh feed
-            } else {
-                JOptionPane.showMessageDialog(this, "Gagal menghapus diary!");
-            }
+            JButton btnDelete = new JButton("🗑");
+            styleIconButton(btnDelete);
+            btnDelete.addActionListener(e -> {
+                int confirm = JOptionPane.showConfirmDialog(
+                        this,
+                        "Yakin ingin menghapus diary ini?",
+                        "Konfirmasi",
+                        JOptionPane.YES_NO_OPTION
+                );
+                if (confirm == JOptionPane.YES_OPTION) {
+                    diaryController.deleteDiary(diaryId);
+                    loadDiary();
+                }
+            });
+            iconPanel.add(btnDelete);
         }
-    });
-
-    iconPanel.add(btnDelete);
-}
-
 
         // ===== LIKE =====
-        boolean liked = Session.isLoggedIn() &&
-                likeController.isLiked(userId, diaryId);
-
-        int totalLike = likeController.getTotalLike(diaryId);
-
         JButton btnLike = new JButton();
         styleIconButton(btnLike);
-        updateLikeButton(btnLike, liked, totalLike);
+
+        updateLikeButton(
+                btnLike,
+                Session.isLoggedIn() && likeController.isLiked(Session.getUserId(), diaryId),
+                likeController.getTotalLike(diaryId)
+        );
 
         btnLike.addActionListener(e -> {
             if (!Session.isLoggedIn()) {
@@ -173,15 +213,19 @@ if (Session.isLoggedIn() && diary.getUserId() == Session.getUserId()) {
                 return;
             }
 
-            likeController.toggleLike(userId, diaryId);
-            loadDiary(); // refresh
+            int uid = Session.getUserId();
+            likeController.toggleLike(uid, diaryId);
+
+            updateLikeButton(
+                    btnLike,
+                    likeController.isLiked(uid, diaryId),
+                    likeController.getTotalLike(diaryId)
+            );
         });
 
-        // ===== COMMENT (TIDAK DIUBAH) =====
-        int totalComment = commentController.getTotalComment(diaryId);
-        JButton btnComment = new JButton("💬 " + totalComment);
+        // ===== COMMENT =====
+        JButton btnComment = new JButton("💬 " + commentController.getTotalComment(diaryId));
         styleIconButton(btnComment);
-
         btnComment.addActionListener(e -> {
             setVisible(false);
             new CommentView(this, diary);
@@ -193,7 +237,7 @@ if (Session.isLoggedIn() && diary.getUserId() == Session.getUserId()) {
         footer.add(lblUser, BorderLayout.WEST);
         footer.add(iconPanel, BorderLayout.EAST);
 
-        card.add(txtContent, BorderLayout.CENTER);
+        card.add(contentPanel, BorderLayout.CENTER);
         card.add(footer, BorderLayout.SOUTH);
 
         JPanel wrapper = new JPanel(new BorderLayout());
@@ -208,13 +252,8 @@ if (Session.isLoggedIn() && diary.getUserId() == Session.getUserId()) {
     // HELPER
     // ==============================
     private void updateLikeButton(JButton btn, boolean liked, int total) {
-        if (liked) {
-            btn.setText("❤️ " + total);
-            btn.setForeground(Color.RED);
-        } else {
-            btn.setText("🤍 " + total);
-            btn.setForeground(new Color(120, 120, 120));
-        }
+        btn.setText((liked ? "❤️ " : "🤍 ") + total);
+        btn.setForeground(liked ? Color.RED : new Color(120, 120, 120));
     }
 
     private void styleIconButton(JButton btn) {
