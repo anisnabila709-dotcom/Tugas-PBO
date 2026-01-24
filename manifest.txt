@@ -1,0 +1,2 @@
+Main-Class: minidiary.main.MainApp
+Class-Path: lib/mysql-connector-j-9.5.0.jar
