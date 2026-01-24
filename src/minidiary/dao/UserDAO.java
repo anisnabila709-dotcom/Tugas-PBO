@@ -86,4 +86,30 @@ public class UserDAO {
         }
         return null;
     }
+
+    // ===== GET USER BY ID =====
+    public User getById(int id) {
+        String sql = "SELECT * FROM users WHERE id = ?";
+
+        try (Connection conn = Database.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return new User(
+                        rs.getInt("id"),
+                        rs.getString("username"),
+                        rs.getString("email"),
+                        rs.getString("password")
+                );
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }

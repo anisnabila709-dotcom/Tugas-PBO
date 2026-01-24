@@ -3,6 +3,8 @@ package minidiary.view;
 import minidiary.controller.CommentController;
 import minidiary.model.Comment;
 import minidiary.model.Diary;
+import minidiary.dao.UserDAO;
+import minidiary.model.User;
 
 import javax.swing.*;
 import java.awt.*;
@@ -54,7 +56,7 @@ public class CommentView extends JFrame {
         // ================= CENTER =================
         JPanel centerPanel = new JPanel(new BorderLayout());
 
-        // ===== POSTINGAN DIARY (SCROLL AMAN) =====
+        // ===== POSTINGAN DIARY =====
         JPanel diaryPanel = new JPanel(new BorderLayout());
         diaryPanel.setBorder(BorderFactory.createTitledBorder("Postingan"));
 
@@ -73,13 +75,13 @@ public class CommentView extends JFrame {
         JScrollPane diaryScroll = new JScrollPane(txtContent);
         diaryScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         diaryScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        diaryScroll.setPreferredSize(new Dimension(0, 170)); // 🔥 BATAS TINGGI FIX
+        diaryScroll.setPreferredSize(new Dimension(0, 170));
         diaryScroll.getVerticalScrollBar().setUnitIncrement(16);
 
         diaryPanel.add(lblTitle, BorderLayout.NORTH);
         diaryPanel.add(diaryScroll, BorderLayout.CENTER);
 
-        // ===== KOMENTAR (SCROLL HALUS) =====
+        // ===== KOMENTAR =====
         commentPanel = new JPanel(new GridBagLayout());
 
         JScrollPane commentScroll = new JScrollPane(commentPanel);
@@ -118,8 +120,8 @@ public class CommentView extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(4, 6, 4, 6);
 
-        List<Comment> comments =
-                commentController.getCommentsByDiary(diary.getId());
+        // ✅ Ambil semua komentar dari controller
+        List<Comment> comments = commentController.getCommentsByDiary(diary.getId());
 
         if (comments.isEmpty()) {
             JLabel lblEmpty = new JLabel("Belum ada komentar");
@@ -127,6 +129,8 @@ public class CommentView extends JFrame {
             gbc.anchor = GridBagConstraints.CENTER;
             commentPanel.add(lblEmpty, gbc);
         } else {
+            UserDAO userDAO = new UserDAO();
+
             for (Comment c : comments) {
                 JPanel card = new JPanel(new BorderLayout());
                 card.setBorder(BorderFactory.createCompoundBorder(
@@ -134,7 +138,14 @@ public class CommentView extends JFrame {
                         BorderFactory.createEmptyBorder(6, 6, 6, 6)
                 ));
 
-                JLabel lblUser = new JLabel("User ID: " + c.getUserId());
+                // Ambil username dari user_id
+                String username = "Unknown";
+                User user = userDAO.getById(c.getUserId());
+                if (user != null) {
+                    username = user.getUsername();
+                }
+
+                JLabel lblUser = new JLabel(username);
                 lblUser.setFont(new Font("Segoe UI", Font.BOLD, 12));
 
                 JTextArea txt = new JTextArea(c.getContent());
@@ -154,7 +165,7 @@ public class CommentView extends JFrame {
             }
         }
 
-        // 🔥 SPACER biar scroll ringan & natural
+        // SPACER biar scroll smooth
         gbc.weighty = 1;
         commentPanel.add(Box.createVerticalGlue(), gbc);
 

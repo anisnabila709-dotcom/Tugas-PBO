@@ -15,19 +15,13 @@ public class CommentController {
         commentDAO = new CommentDAO();
     }
 
+    // ==============================
     // TAMBAH KOMENTAR
+    // ==============================
     public boolean addComment(int diaryId, String content) {
-
-        // cek login
         User user = Session.getCurrentUser();
-        if (user == null) {
-            return false;
-        }
-
-        // validasi komentar
-        if (content == null || content.trim().isEmpty()) {
-            return false;
-        }
+        if (user == null) return false;
+        if (content == null || content.trim().isEmpty()) return false;
 
         Comment comment = new Comment();
         comment.setDiaryId(diaryId);
@@ -37,19 +31,25 @@ public class CommentController {
         return commentDAO.addComment(comment);
     }
 
+    // ==============================
     // AMBIL KOMENTAR PER DIARY
+    // ==============================
+    // Nama method diganti jadi getCommentsByDiary biar serempak dengan CommentView
     public List<Comment> getCommentsByDiary(int diaryId) {
         return commentDAO.getByDiaryId(diaryId);
     }
 
+    // ==============================
     // HAPUS KOMENTAR (opsional)
+    // ==============================
     public boolean deleteComment(int commentId) {
         return commentDAO.deleteComment(commentId);
     }
 
+    // ==============================
     // HITUNG TOTAL KOMENTAR
+    // ==============================
     public int getTotalComment(int diaryId) {
         return commentDAO.countByDiaryId(diaryId);
     }
-
 }

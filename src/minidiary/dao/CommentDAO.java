@@ -67,16 +67,17 @@ public class CommentDAO {
     }
 
     // ==============================
-    // AMBIL KOMENTAR PER DIARY
+    // AMBIL KOMENTAR PER DIARY (FIX: INCLUDE USERNAME)
     // ==============================
     public List<Comment> getByDiaryId(int diaryId) {
         List<Comment> comments = new ArrayList<>();
 
         String sql = """
-            SELECT *
-            FROM comments
-            WHERE diary_id = ?
-            ORDER BY id ASC
+            SELECT c.id, c.diary_id, c.user_id, c.content, u.username
+            FROM comments c
+            JOIN users u ON c.user_id = u.id
+            WHERE c.diary_id = ?
+            ORDER BY c.id ASC
         """;
 
         try (Connection conn = Database.getConnection();
@@ -91,6 +92,7 @@ public class CommentDAO {
                 c.setDiaryId(rs.getInt("diary_id"));
                 c.setUserId(rs.getInt("user_id"));
                 c.setContent(rs.getString("content"));
+                c.setUsername(rs.getString("username")); // <-- fix username
 
                 comments.add(c);
             }
