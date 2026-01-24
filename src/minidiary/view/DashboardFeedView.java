@@ -157,17 +157,15 @@ public class DashboardFeedView extends JFrame {
         contentPanel.add(txtContent, BorderLayout.CENTER);
         if (isLong) contentPanel.add(lblToggle, BorderLayout.SOUTH);
 
-        // ===== USERNAME =====
+        // ===== FOOTER (USERNAME + ICONS sejajar, dengan jarak tipis) =====
+        JPanel footer = new JPanel(new BorderLayout());
+        footer.setBackground(Color.WHITE);
+        footer.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0)); // jarak tipis dari isi
+
         JLabel lblUser = new JLabel("- " + diary.getUsername());
         lblUser.setFont(new Font("Segoe UI", Font.ITALIC, 12));
         lblUser.setForeground(new Color(120, 120, 120));
 
-        JPanel usernamePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        usernamePanel.setOpaque(false);
-        usernamePanel.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
-        usernamePanel.add(lblUser);
-
-        // ===== ICONS =====
         JPanel iconPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         iconPanel.setOpaque(false);
 
@@ -230,10 +228,12 @@ public class DashboardFeedView extends JFrame {
         iconPanel.add(btnLike);
         iconPanel.add(btnComment);
 
+        footer.add(lblUser, BorderLayout.WEST);
+        footer.add(iconPanel, BorderLayout.EAST);
+
         // ===== SUSUNAN =====
         card.add(contentPanel, BorderLayout.NORTH);
-        card.add(usernamePanel, BorderLayout.CENTER);
-        card.add(iconPanel, BorderLayout.SOUTH);
+        card.add(footer, BorderLayout.SOUTH);
 
         JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.setBackground(new Color(245, 245, 245));
