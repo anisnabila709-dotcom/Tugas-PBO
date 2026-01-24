@@ -199,11 +199,15 @@ public class DashboardFeedView extends JFrame {
 
         JButton btnLike = new JButton();
         styleIconButton(btnLike);
+
+        // pertama kali render, set sesuai kondisi
         updateLikeButton(
-                btnLike,
-                Session.isLoggedIn() && likeController.isLiked(Session.getUserId(), diaryId),
-                likeController.getTotalLike(diaryId)
+            btnLike,
+            Session.isLoggedIn() && likeController.isLiked(Session.getUserId(), diaryId),
+            likeController.getTotalLike(diaryId)
         );
+
+        // action listener untuk toggle
         btnLike.addActionListener(e -> {
             if (!Session.isLoggedIn()) {
                 JOptionPane.showMessageDialog(this, "Silakan login dulu ❤️");
@@ -211,10 +215,12 @@ public class DashboardFeedView extends JFrame {
             }
             int uid = Session.getUserId();
             likeController.toggleLike(uid, diaryId);
+
+            // setelah toggle, refresh tampilan tombol
             updateLikeButton(
-                    btnLike,
-                    likeController.isLiked(uid, diaryId),
-                    likeController.getTotalLike(diaryId)
+                btnLike,
+                likeController.isLiked(uid, diaryId),
+                likeController.getTotalLike(diaryId)
             );
         });
 
@@ -250,6 +256,7 @@ public class DashboardFeedView extends JFrame {
         btn.setText((liked ? "❤️ " : "🤍 ") + total);
         btn.setForeground(liked ? Color.RED : new Color(120, 120, 120));
     }
+
 
     private void styleIconButton(JButton btn) {
         btn.setFocusPainted(false);

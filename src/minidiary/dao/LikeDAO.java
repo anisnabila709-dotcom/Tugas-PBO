@@ -7,7 +7,7 @@ public class LikeDAO {
 
     // ===== CEK APAKAH USER SUDAH LIKE =====
     public boolean isLiked(int userId, int diaryId) {
-        String sql = "SELECT id FROM likes WHERE users_id = ? AND diaries_id = ?";
+        String sql = "SELECT id FROM likes WHERE user_id = ? AND diary_id = ?";
 
         try (Connection c = Database.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
@@ -26,7 +26,7 @@ public class LikeDAO {
 
     // ===== LIKE =====
     public boolean like(int userId, int diaryId) {
-        String sql = "INSERT INTO likes (users_id, diaries_id) VALUES (?, ?)";
+        String sql = "INSERT INTO likes (user_id, diary_id) VALUES (?, ?)";
 
         try (Connection c = Database.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
@@ -44,7 +44,7 @@ public class LikeDAO {
 
     // ===== UNLIKE =====
     public boolean unlike(int userId, int diaryId) {
-        String sql = "DELETE FROM likes WHERE users_id = ? AND diaries_id = ?";
+        String sql = "DELETE FROM likes WHERE user_id = ? AND diary_id = ?";
 
         try (Connection c = Database.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
@@ -62,7 +62,7 @@ public class LikeDAO {
 
     // ===== TOTAL LIKE =====
     public int getTotalLike(int diaryId) {
-        String sql = "SELECT COUNT(*) FROM likes WHERE diaries_id = ?";
+        String sql = "SELECT COUNT(*) FROM likes WHERE diary_id = ?";
 
         try (Connection c = Database.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {

@@ -25,41 +25,41 @@ CREATE TABLE IF NOT EXISTS `comments` (
   `diary_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `content` text NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `created.at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
-  KEY `diary_id` (`diary_id`),
-  KEY `user_id` (`user_id`),
+  KEY `diary.id` (`diary_id`) USING BTREE,
+  KEY `user.id` (`user_id`) USING BTREE,
   CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`diary_id`) REFERENCES `diaries` (`id`) ON DELETE CASCADE,
   CONSTRAINT `comments_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Data exporting was unselected.
 
 -- Dumping structure for table minidiaryapp.diaries
 CREATE TABLE IF NOT EXISTS `diaries` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL DEFAULT 0,
   `title` varchar(100) DEFAULT NULL,
-  `content` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `content` text DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `diaries_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Data exporting was unselected.
 
 -- Dumping structure for table minidiaryapp.likes
 CREATE TABLE IF NOT EXISTS `likes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `users_id` int(11) NOT NULL,
-  `diaries_id` int(11) NOT NULL,
+  `diary_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `likes_id` (`users_id`,`diaries_id`) USING BTREE,
-  KEY `diaries_id` (`diaries_id`),
-  CONSTRAINT `FK_likes_diaries` FOREIGN KEY (`diaries_id`) REFERENCES `diaries` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `FK_likes_users` FOREIGN KEY (`users_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  UNIQUE KEY `diary_id` (`diary_id`,`user_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `likes_ibfk_1` FOREIGN KEY (`diary_id`) REFERENCES `diaries` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `likes_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Data exporting was unselected.
 
